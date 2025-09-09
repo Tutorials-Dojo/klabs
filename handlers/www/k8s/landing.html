@@ -16,7 +16,7 @@
     
     <style>
         :root {
-            --primary: #326ce5;
+            --primary: #ffffff;
             --primary-dark: #295bc7;
             --secondary: #ff6b6b;
             --dark: #2d3748;
@@ -34,7 +34,7 @@
         body {
             font-family: 'Roboto', sans-serif;
             color: var(--dark);
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #3e65c8 0%, #2c6fdb 100%);
             min-height: 100vh;
         }
         
@@ -46,6 +46,13 @@
         .header {
             padding: 1.5rem 0;
             border-bottom: none;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
         }
         
         .logo {
@@ -64,7 +71,7 @@
         }
         
         .nav-pills .nav-link {
-            color: var(--dark);
+            color: var(--primary);
             font-weight: 500;
             border-radius: 50px;
             padding: 0.5rem 1.2rem;
@@ -78,7 +85,7 @@
         
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,247,250,0.9) 100%);
+            background: linear-gradient(135deg, rgba(167, 181, 241, 0.559) 0%, rgba(163, 182, 212, 0.471) 100%);
             border-radius: 16px;
             padding: 3rem;
             margin: 2rem 0;
@@ -88,7 +95,7 @@
         }
         
         .hero-icon {
-            font-size: 4rem;
+            font-size: 17rem;
             color: var(--primary);
             margin-bottom: 1.5rem;
         }
@@ -97,12 +104,12 @@
             font-weight: 700;
             font-size: 2.8rem;
             margin-bottom: 1rem;
-            color: var(--dark);
+            color: var(--primary);
         }
         
         .hero p {
             font-size: 1.2rem;
-            color: var(--gray);
+            color: var(--primary);
             margin-bottom: 2rem;
             max-width: 700px;
             margin-left: auto;
@@ -166,7 +173,7 @@
         }
         
         .feature-card {
-            background: white;
+            background: rgba(158, 180, 240, 0.37);
             border-radius: 16px;
             padding: 2rem;
             height: 100%;
@@ -188,17 +195,17 @@
         .feature-card h3 {
             font-weight: 600;
             margin-bottom: 1rem;
-            color: var(--dark);
+            color: var(--primary);
         }
         
         .feature-card p {
-            color: var(--gray);
+            color: var(--primary);
         }
         
         /* Footer */
         .footer {
             padding: 2rem 0;
-            color: var(--gray);
+            color: var(--primary);
             text-align: center;
             margin-top: 3rem;
         }
@@ -229,19 +236,19 @@
         <!-- Header -->
         <div class="header clearfix">
             <nav class="d-flex justify-content-between align-items-center">
-                <a class="logo" href="#">
-                    <i class="fas fa-cubes logo-icon"></i>
+                <a class="logo">
+                    <i class="fas fa-dharmachakra logo-icon"></i>
                     <span>Kubernetes PlayClouds</span>
                 </a>
-                <a href="https://tutorialsdojo.com" target="_blank" class="btn btn-outline-secondary">
-                    <i class="fas fa-external-link-alt me-2"></i> Tutorials Dojo
+                <a href="https://tutorialsdojo.com" target="_blank">
+                 Tutorials Dojo
                 </a>
             </nav>
         </div>
 
         <!-- Hero Section -->
         <div class="hero">
-            <i class="fas fa-cloud-upload-alt hero-icon"></i>
+            <i class="fas fa-dharmachakra hero-icon"></i>
             <h1 class="display-4">Master Kubernetes in Your Browser</h1>
             <p class="lead">
                 A powerful, interactive playground to learn and experiment with Kubernetes in a safe sandbox environment.
@@ -297,11 +304,6 @@
                             It provides a playground which allows users to run K8s clusters in a matter of seconds. 
                             It gives the experience of having a free Alpine Linux Virtual Machine in your browser. 
                             Under the hood, Docker-in-Docker (DinD) is used to give the effect of multiple VMs/PCs.
-                        </p>
-                        <p class="card-text mt-3">
-                            If you want to learn more about Kubernetes, consider the
-                            <a href="https://training.play-with-kubernetes.com/">Kubernetes Learning Classroom</a>
-                            which provides more directed learning using an integrated commandline environment.
                         </p>
                     </div>
                 </div>
