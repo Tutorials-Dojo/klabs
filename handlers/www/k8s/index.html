@@ -1,754 +1,654 @@
-<!DOCTYPE html>
-<html ng-app="DockerPlay" ng-controller="PlayController">
-<head>
-    <title>Kubernetes Playground</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a202c;
-            color: white;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .playground-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .playground-header {
-            background: #2d3748;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #4a5568;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header-left i {
-            font-size: 24px;
-            color: #4fc3f7;
-        }
-
-        .session-timer {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background: #4fc3f7;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #29b6f6;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #cbd5e0;
-            border: 1px solid #4a5568;
-        }
-
-        .btn-outline:hover {
-            background: #4a5568;
-            color: white;
-        }
-
-        .playground-content {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: #2d3748;
-            border-right: 1px solid #4a5568;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .sidebar-section {
-            margin-bottom: 30px;
-        }
-
-        .sidebar-section h3 {
-            font-size: 14px;
-            text-transform: uppercase;
-            color: #a0aec0;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-
-        .instance-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .instance-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .instance-item:hover {
-            background: #4a5568;
-        }
-
-        .instance-item.active {
-            background: #4fc3f7;
-            color: white;
-        }
-
-        .instance-status {
-            margin-left: auto;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-indicator.running {
-            background: #48bb78;
-        }
-
-        .resource-monitor {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .resource {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .resource label {
-            font-size: 12px;
-            color: #a0aec0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #4a5568;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background: #4fc3f7;
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .resource-value {
-            font-size: 11px;
-            color: #a0aec0;
-        }
-
-        .terminal-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #1a202c;
-        }
-
-        .terminal-header {
-            background: #2d3748;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #4a5568;
-        }
-
-        .terminal-tabs {
-            display: flex;
-            gap: 5px;
-        }
-
-        .tab {
-            padding: 5px 15px;
-            background: #4a5568;
-            border-radius: 4px 4px 0 0;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .tab.active {
-            background: #1a202c;
-            color: #4fc3f7;
-        }
-
-        .terminal-controls {
-            display: flex;
-            gap: 5px;
-        }
-
-        .control-btn {
-            background: transparent;
-            color: #a0aec0;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-
-        .control-btn:hover {
-            background: #4a5568;
-            color: white;
-        }
-
-        .terminal-body {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .terminal-line {
-            margin-bottom: 5px;
-            white-space: pre-wrap;
-        }
-
-        .cursor {
-            animation: blink 1s infinite;
-        }
-
-        .btn-danger {
-            background: #f56565;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #e53e3e;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        .terminal-input {
-            background: #2d3748;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-top: 1px solid #4a5568;
-        }
-
-        .prompt {
-            color: #4fc3f7;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-
-        #command-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .playground-footer {
-            background: #2d3748;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #4a5568;
-            font-size: 12px;
-        }
-
-        .footer-info {
-            color: #a0aec0;
-        }
-
-        .footer-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Additional styles for Angular integration */
-        [ng-cloak] {
-            display: none !important;
-        }
-
-        .disconnected {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.87);
-            z-index: 1000;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .upload-status {
-            padding: 8px;
-            background: #ffecb3;
-            margin-bottom: 8px;
-            color: #333;
-            border-radius: 4px;
-        }
-
-        .instance-details {
-            padding: 15px;
-            background: #2d3748;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        .detail-row {
-            display: flex;
-            margin-bottom: 10px;
-            gap: 15px;
-        }
-
-        .detail-item {
-            flex: 1;
-        }
-
-        .detail-item label {
-            display: block;
-            font-size: 12px;
-            color: #a0aec0;
-            margin-bottom: 5px;
-        }
-
-        .detail-item .value {
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 8px;
-            border-radius: 4px;
-            word-break: break-all;
-        }
-
-        .port-chip {
-            display: inline-block;
-            background: #4a5568;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin: 0 5px 5px 0;
-            font-size: 12px;
-        }
-
-        .port-chip a {
-            color: #4fc3f7;
-            text-decoration: none;
-        }
-
-        .port-chip a:hover {
-            text-decoration: underline;
-        }
-    </style>
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89019737-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-89019737-3');
-    </script>
-</head>
-
-<body ng-cloak>
-    <div class="playground-container">
-        <!-- Header -->
-        <div class="playground-header">
-            <div class="header-left">
-                <i class="fas fa-cubes"></i>
-                <h2>Kubernetes Playground</h2>
-                <div class="session-timer">
-                    <i class="fas fa-clock"></i>
-                    <span>{{ttl}} hours remaining</span>
-                </div>
-            </div>
-            <div class="header-right">
-                <button class="btn btn-primary" ng-click="newInstance()" ng-disabled="isInstanceBeingCreated">
-                    <i class="fas fa-plus"></i> {{newInstanceBtnText}}
-                </button>
-                <button class="btn btn-danger" ng-click="closeSession()">
-                    <i class="fas fa-times"></i> Close Session
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="playground-content">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3>Instances</h3>
-                    <div class="instance-list">
-                        <div ng-repeat="instance in instances | orderBy:'hostname'" 
-                             class="instance-item" 
-                             ng-class="{active: instance.name == selectedInstance.name}" 
-                             ng-click="showInstance(instance)">
-                            <i class="fas fa-server"></i>
-                            <span>{{instance.hostname}}</span>
-                            <div class="instance-status">
-                                <span class="status-indicator running"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section" ng-if="selectedInstance">
-                    <h3>Resources</h3>
-                    <div class="resource-monitor">
-                        <div class="resource">
-                            <label>CPU</label>
-                            <div class="progress-bar">
-                                <div class="progress" ng-style="{width: selectedInstance.cpu + '%'}"></div>
-                            </div>
-                            <div class="resource-value">{{selectedInstance.cpu}}%</div>
-                        </div>
-                        <div class="resource">
-                            <label>Memory</label>
-                            <div class="progress-bar">
-                                <div class="progress" ng-style="{width: selectedInstance.mem + '%'}"></div>
-                            </div>
-                            <div class="resource-value">{{selectedInstance.mem}}%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Terminal Area -->
-            <div class="terminal-container">
-                <div class="terminal-header" ng-if="selectedInstance">
-                    <div class="terminal-tabs">
-                        <div class="tab active">{{selectedInstance.name}}</div>
-                    </div>
-                    <div class="terminal-controls">
-                        <button class="control-btn" title="Fullscreen">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                        <button class="control-btn" title="Settings">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Instance Details -->
-                <div class="instance-details" ng-if="selectedInstance">
-                    <div class="detail-row">
-                        <div class="detail-item">
-                            <label>IP Address</label>
-                            <div class="value">{{selectedInstance.ip}}</div>
-                        </div>
-                        <div class="detail-item">
-                            <label>Hostname</label>
-                            <div class="value">{{selectedInstance.hostname}}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <div class="detail-item">
-                            <label>Ports</label>
-                            <div>
-                                <span ng-repeat="port in selectedInstance.ports" class="port-chip">
-                                    <a href="{{getProxyUrl(selectedInstance, port)}}" target="_blank">{{port}}</a>
-                                </span>
-                                <span ng-if="!selectedInstance.ports.length">No ports exposed</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <div class="detail-item">
-                            <label>Direct URL</label>
-                            <div class="value">{{selectedInstance.proxy_host}}.direct.{{host}}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <button class="btn btn-danger" ng-click="deleteInstance(selectedInstance)" ng-disabled="isInstanceBeingDeleted">
-                            <i class="fas fa-trash"></i> {{deleteInstanceBtnText}}
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Terminal -->
-                <div class="terminal-body" ng-if="selectedInstance">
-                    <div ng-show="uploadMessage" class="upload-status">
-                        <div>{{uploadMessage}}</div>
-                        <div style="margin-top: 5px;">
-                            <div style="height: 4px; background: #4a5568; border-radius: 2px;">
-                                <div style="height: 100%; background: #4fc3f7; border-radius: 2px;" ng-style="{width: uploadProgress + '%'}"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div ng-show="selectedInstance.status=='reconnect'" class="upload-status">
-                        Connection has been lost. Trying to reconnect terminal...
-                    </div>
-                    
-                    <div id="terminal-{{selectedInstance.name}}" style="height: 400px; width: 100%;"></div>
-                </div>
-                
-                <div class="terminal-body" ng-if="!selectedInstance">
-                    <p>No instance selected. Please add an instance to get started.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="playground-footer">
-            <div class="footer-info">
-                Kubernetes Playground - Session ID: {{sessionId}}
-            </div>
-            <div class="footer-actions">
-                <button class="btn btn-outline">
-                    <i class="fas fa-question-circle"></i> Help
-                </button>
-                <button class="btn btn-outline">
-                    <i class="fas fa-download"></i> Export
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Connection Status Overlay -->
-    <section ng-if="!connected" class="disconnected">
-        <h1>No connection to server. Reconnecting...</h1>
-        <div style="margin-top: 20px;">
-            <i class="fas fa-sync fa-spin" style="font-size: 24px;"></i>
-        </div>
-    </section>
-
-    <!-- Session Expired Message -->
-    <section id="sessionEnd" ng-if="!isAlive" class="disconnected">
-        <div>
-            <h1>Your session has expired.</h1>
-            <p style="margin-top: 10px;">All instances and data have been cleared.</p>
-            <button class="btn btn-primary" style="margin-top: 20px;" onclick="window.location.reload()">
-                <i class="fas fa-redo"></i> Start New Session
-            </button>
-        </div>
-    </section>
-
-    <!-- External Scripts -->
-    <script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://unpkg.com/angular@1.5.5/angular.min.js"></script>
-    <script src="https://unpkg.com/angular-animate@1.5.5/angular-animate.min.js"></script>
-    <script src="https://unpkg.com/angular-aria@1.5.5/angular-aria.min.js"></script>
-    <script src="https://unpkg.com/angular-messages@1.5.5/angular-messages.min.js"></script>
-    <script src="https://unpkg.com/ng-file-upload@12.2.13/dist/ng-file-upload-all.min.js"></script>
-    <script src="https://unpkg.com/xterm@4.19.0/lib/xterm.js"></script>
-    <script src="https://unpkg.com/xterm-addon-fit@0.5.0/lib/xterm-addon-fit.js"></script>
-    <script src="https://unpkg.com/moment@2.16.0/min/moment.min.js"></script>
-
-    <!-- App Script -->
-    <script>
-        // Setup XTerm.js
-        function setupXTerm() {
-            Terminal.applyAddon(fit);
-        }
+<!doctype html>
+<html ng-app="KubernetesPlay" ng-controller="PlayController">
+    <head>
+        <title>Kubernetes Playground</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons" />
+        <link rel="stylesheet" href="https://unpkg.com/angular-material@1.1.10/angular-material.min.css">
+        <link rel="stylesheet" href="/assets/xterm/xterm.css" />
+        <link rel="stylesheet" href="/assets/xterm/addons/fullscreen/fullscreen.css" />
+        <link rel="stylesheet" href="/assets/style.css" />
         
-        // Main App Script
-        angular.module('DockerPlay', ['ngAnimate', 'ngAria', 'ngMessages', 'ngFileUpload'])
-            .controller('PlayController', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
-                // Initialize variables
-                $scope.instances = [
-                    {name: 'node1', hostname: 'node1', ip: '192.168.1.10', cpu: 45, mem: 65, ports: [80, 443], proxy_host: 'node1'},
-                    {name: 'node2', hostname: 'node2', ip: '192.168.1.11', cpu: 30, mem: 40, ports: [8080], proxy_host: 'node2'}
-                ];
-                $scope.selectedInstance = $scope.instances[0];
-                $scope.isAlive = true;
-                $scope.connected = true;
-                $scope.isInstanceBeingCreated = false;
-                $scope.isInstanceBeingDeleted = false;
-                $scope.newInstanceBtnText = "Add Instance";
-                $scope.deleteInstanceBtnText = "Delete Instance";
-                $scope.ttl = "4";
-                $scope.host = window.location.hostname;
-                $scope.sessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
-                $scope.uploadMessage = null;
-                $scope.uploadProgress = 0;
-                
-                // Initialize terminals object
-                $scope.terminals = {};
-                
-                // Setup WebSocket connection
-                const wsScheme = window.location.protocol === "https:" ? "wss:" : "ws:";
-                const wsUri = wsScheme + "//" + window.location.host + "/ws";
-                const socket = new ReconnectingWebSocket(wsUri);
-                
-                socket.onopen = function() {
-                    console.log("WebSocket connection established");
-                    $scope.connected = true;
-                    $scope.$apply();
-                };
-                
-                socket.onclose = function() {
-                    console.log("WebSocket connection closed");
-                    $scope.connected = false;
-                    $scope.$apply();
-                };
-                
-                // Function to create a new instance
-                $scope.newInstance = function() {
-                    $scope.isInstanceBeingCreated = true;
-                    $scope.newInstanceBtnText = "Creating...";
-                    
-                    // Simulate instance creation
-                    $timeout(function() {
-                        const newInstance = {
-                            name: 'node' + ($scope.instances.length + 1),
-                            hostname: 'node' + ($scope.instances.length + 1),
-                            ip: '192.168.1.' + (10 + $scope.instances.length),
-                            cpu: Math.floor(Math.random() * 100),
-                            mem: Math.floor(Math.random() * 100),
-                            ports: [3000 + $scope.instances.length],
-                            proxy_host: 'node' + ($scope.instances.length + 1)
-                        };
-                        
-                        $scope.instances.push(newInstance);
-                        $scope.isInstanceBeingCreated = false;
-                        $scope.newInstanceBtnText = "Add Instance";
-                        $scope.$apply();
-                    }, 1500);
-                };
-                
-                // Function to delete an instance
-                $scope.deleteInstance = function(instance) {
-                    $scope.isInstanceBeingDeleted = true;
-                    $scope.deleteInstanceBtnText = "Deleting...";
-                    
-                    // Simulate instance deletion
-                    $timeout(function() {
-                        const index = $scope.instances.indexOf(instance);
-                        if (index > -1) {
-                            $scope.instances.splice(index, 1);
-                        }
-                        
-                        if ($scope.selectedInstance === instance) {
-                            $scope.selectedInstance = $scope.instances.length > 0 ? $scope.instances[0] : null;
-                        }
-                        
-                        $scope.isInstanceBeingDeleted = false;
-                        $scope.deleteInstanceBtnText = "Delete Instance";
-                        $scope.$apply();
-                    }, 1000);
-                };
-                
-                // Function to show an instance
-                $scope.showInstance = function(instance) {
-                    $scope.selectedInstance = instance;
-                };
-                
-                // Function to close the session
-                $scope.closeSession = function() {
-                    $scope.isAlive = false;
-                };
-                
-                // Function to get proxy URL
-                $scope.getProxyUrl = function(instance, port) {
-                    return `http://${instance.proxy_host}.direct.${$scope.host}:${port}`;
-                };
-                
-                // File upload handling
-                $scope.uploadFiles = function(files, invalidFiles) {
-                    if (files && files.length > 0 && $scope.selectedInstance) {
-                        $scope.uploadMessage = "Uploading files...";
-                        $scope.uploadProgress = 0;
-                        
-                        // Simulate file upload progress
-                        const interval = setInterval(() => {
-                            $scope.uploadProgress += 5;
-                            if ($scope.uploadProgress >= 100) {
-                                clearInterval(interval);
-                                $scope.uploadMessage = "Files uploaded successfully!";
-                                $timeout(() => {
-                                    $scope.uploadMessage = null;
-                                }, 3000);
-                            }
-                            $scope.$apply();
-                        }, 100);
-                    }
-                };
-                
-                // Initialize
-                setupXTerm();
-            }]);
+        <!-- Custom CSS Integration -->
+        <style>
+            /* Custom styles integrated with existing Angular Material */
             
-        // Handle beforeunload event
-        window.onbeforeunload = function (e) {
-            e = e || window.event;
-            if (e) {
-                e.returnValue = 'Make sure you saved your session URL';
+            /* Reset and base styles */
+            * {
+                box-sizing: border-box;
             }
-            return 'Make sure you saved your session URL';
-        };
-    </script>
-</body>
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Roboto', sans-serif;
+                background: #1a202c;
+                color: white;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Enhanced playground container */
+            .playground-container {
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+            }
+
+            /* Custom header styling that works with Angular Material */
+            .playground-header {
+                background: #2d3748;
+                padding: 10px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #4a5568;
+                z-index: 100;
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .header-left i {
+                font-size: 24px;
+                color: #4fc3f7;
+            }
+
+            /* Enhanced session timer */
+            .session-timer, .clock {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 14px;
+                color: #4fc3f7;
+                font-weight: 500;
+            }
+
+            .header-right {
+                display: flex;
+                gap: 10px;
+            }
+
+            /* Enhanced button styles that complement Angular Material */
+            .btn, .md-button.md-raised {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 14px;
+                text-transform: none;
+            }
+
+            .btn-primary, .md-button.md-primary {
+                background: #4fc3f7 !important;
+                color: white !important;
+            }
+
+            .btn-primary:hover, .md-button.md-primary:hover {
+                background: #29b6f6 !important;
+                box-shadow: 0 2px 5px rgba(79, 195, 247, 0.3);
+            }
+
+            .btn-outline {
+                background: transparent;
+                color: #cbd5e0;
+                border: 1px solid #4a5568;
+            }
+
+            .btn-outline:hover {
+                background: #4a5568;
+                color: white;
+            }
+
+            .btn-danger, .md-button.md-warn {
+                background: #f56565 !important;
+                color: white !important;
+            }
+
+            .btn-danger:hover, .md-button.md-warn:hover {
+                background: #e53e3e !important;
+                box-shadow: 0 2px 5px rgba(245, 101, 101, 0.3);
+            }
+
+            /* Enhanced sidebar styling */
+            .md-sidenav-left {
+                background: #2d3748 !important;
+                border-right: 1px solid #4a5568;
+                width: 280px !important;
+            }
+
+            .md-sidenav-left .md-toolbar {
+                background: #4a5568 !important;
+            }
+
+            .sidebar-section {
+                margin-bottom: 30px;
+            }
+
+            .sidebar-section h3 {
+                font-size: 14px;
+                text-transform: uppercase;
+                color: #a0aec0;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            /* Enhanced instance list styling */
+            .md-list-item {
+                background: transparent;
+                color: #cbd5e0;
+                border-radius: 4px;
+                margin-bottom: 5px;
+                transition: all 0.3s ease;
+            }
+
+            .md-list-item:hover {
+                background: #4a5568 !important;
+                color: white;
+            }
+
+            .md-list-item.selected {
+                background: #4fc3f7 !important;
+                color: white !important;
+            }
+
+            .md-list-item md-icon {
+                color: #4fc3f7;
+            }
+
+            /* Resource monitoring styles */
+            .resource-monitor {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 4px;
+                margin-top: 20px;
+            }
+
+            .resource {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .resource label {
+                font-size: 12px;
+                color: #a0aec0;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 6px;
+                background: #4a5568;
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .progress {
+                height: 100%;
+                background: #4fc3f7;
+                border-radius: 3px;
+                transition: width 0.3s ease;
+            }
+
+            .resource-value {
+                font-size: 11px;
+                color: #a0aec0;
+            }
+
+            /* Enhanced content area */
+            .playground-content {
+                display: flex;
+                flex: 1;
+                overflow: hidden;
+            }
+
+            .md-content {
+                background: #1a202c;
+                color: white;
+            }
+
+            /* Enhanced card styling */
+            .md-card {
+                background: #2d3748 !important;
+                color: white;
+                border: 1px solid #4a5568;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .md-card.stats {
+                margin-bottom: 15px;
+            }
+
+            .md-card-title .md-headline {
+                color: #4fc3f7;
+                font-weight: 500;
+            }
+
+            /* Enhanced form elements */
+            .md-input-container {
+                color: white;
+            }
+
+            .md-input-container label {
+                color: #a0aec0;
+            }
+
+            .md-input-container input {
+                color: white;
+                border-color: #4a5568;
+            }
+
+            .md-input-container input[readonly] {
+                color: #cbd5e0;
+                background: rgba(0, 0, 0, 0.1);
+            }
+
+            /* Enhanced chips styling */
+            .md-chips {
+                background: transparent;
+            }
+
+            .md-chip {
+                background: #4a5568 !important;
+                color: white;
+            }
+
+            .md-chip a {
+                color: #4fc3f7;
+                text-decoration: none;
+            }
+
+            .md-chip a:hover {
+                color: #29b6f6;
+            }
+
+            /* Terminal styling enhancements */
+            .terminal-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                background: #1a202c;
+            }
+
+            .terminal-instance {
+                background: #000 !important;
+                padding: 10px;
+                border-radius: 4px;
+                font-family: 'Courier New', monospace;
+            }
+
+            /* Upload status styling */
+            .uploadStatus {
+                background: #2d3748;
+                color: #4fc3f7;
+                padding: 10px;
+                border-radius: 4px;
+                margin-bottom: 10px;
+            }
+
+            .md-progress-linear {
+                background: #4a5568;
+            }
+
+            .md-progress-linear .md-bar {
+                background: #4fc3f7;
+            }
+
+            /* Disconnected state styling */
+            .disconnected {
+                background: #1a202c;
+                color: #f56565;
+                text-align: center;
+                padding: 50px;
+            }
+
+            .disconnected .md-progress-circular {
+                margin-left: 20px;
+            }
+
+            /* Dialog and modal enhancements */
+            .md-dialog-container {
+                background: #2d3748;
+            }
+
+            .md-toolbar.md-theme-kube {
+                background: #4a5568 !important;
+            }
+
+            /* Settings modal specific styles */
+            .md-dialog-content {
+                background: #2d3748;
+                color: white;
+            }
+
+            .md-select-value {
+                color: white;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .md-sidenav-left {
+                    width: 250px !important;
+                }
+                
+                .playground-header {
+                    padding: 8px 15px;
+                }
+                
+                .btn {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                }
+            }
+
+            /* Animation enhancements */
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+
+            .cursor {
+                animation: blink 1s infinite;
+            }
+
+            /* Hover effects */
+            .md-button:hover {
+                transform: translateY(-1px);
+            }
+
+            /* Focus states */
+            .md-button:focus,
+            input:focus {
+                outline: 2px solid #4fc3f7;
+                outline-offset: 2px;
+            }
+
+            /* Loading states */
+            .md-progress-circular {
+                color: #4fc3f7;
+            }
+
+            /* Custom scrollbar for webkit browsers */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #2d3748;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #4a5568;
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #4fc3f7;
+            }
+
+            /* Drag and drop styling */
+            .drop-box.dragover {
+                background: rgba(79, 195, 247, 0.1);
+                border: 2px dashed #4fc3f7;
+            }
+        </style>
+        
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89019737-3"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-89019737-3');
+        </script>
+    </head>
+    <body>
+
+        <div layout="column" style="height:100%;" ng-cloak>
+            <section id="sessionEnd" layout="row" flex ng-if="!isAlive">
+              <md-content flex layout-padding ng-if="!instances.length">
+                <div layout="column" layout-align="top center">
+                  <p>
+                    <strong>Your session has expired.</strong>
+                  </p>
+                </div>
+                <div flex></div>
+              </md-content>
+            </section>
+
+            <section ng-if="!connected" class="disconnected" layout="row" layout-align="center center">
+                <h1 class="md-headline">No connection to server. Reconnecting...</h1>
+                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
+            </section>
+
+            <section id="popupContainer" layout="row" flex ng-if="isAlive">
+              <md-sidenav
+                  class="md-sidenav-left"
+                  md-component-id="left"
+                  md-theme="kube"
+                  md-is-locked-open="$mdMedia('gt-sm')"
+                  md-whiteframe="4" layout="column">
+
+                <md-toolbar class="md-accent md-hue-3">
+                  <span class="clock">{{ttl}}</span>
+                  <md-button class="md-warn md-raised" ng-click="closeSession()">Close session</md-button>
+                  <div class="md-toolbar-tools">
+                    <h1 class="md-toolbar-tools">Instances</h1>
+                    <settings-icon></settings-icon><br/>
+                  </div>
+                  <div class="md-toolbar-tools" ng-if="playground.allow_windows_instances">
+                      <md-switch ng-model="type.windows">
+                          Windows containers {{windows}}
+                      </md-switch>
+                  </div>
+                </md-toolbar>
+                <md-content layout-padding>
+                  <md-button ng-click="newInstance()" ng-disabled="isInstanceBeingCreated" class="md-primary">{{newInstanceBtnText}}</md-button>
+              <md-list class="md-dense" flex>
+                <md-list-item ng-switch on="instance.isManager || instance.isK8sManager" class="md-2-line" ng-repeat="instance in instances | orderBy:'hostname'" ng-click="showInstance(instance)" ng-class="instance.name == selectedInstance.name ? 'selected' : false">
+                    <md-icon ng-switch-when="true" style="color: #4fc3f7" md-svg-icon="person"></md-icon>
+                    <md-icon ng-switch-when="false" md-svg-icon="person-outline"></md-icon>
+                    <div class="md-list-item-text" layout="column">
+                        <h3>{{instance.ip}}</h3>
+                        <h4>{{instance.hostname}}</h4>
+                    </div>
+                    <md-divider ng-if="!$last"></md-divider>
+                </md-list-item>
+              </md-list>
+                </md-content>
+              </md-sidenav>
+              <md-content flex layout-padding ng-if="!instances.length">
+                <div layout="column" layout-align="top center">
+                  <p>Add instances to your playground.</p>
+                  <p><strong>Sessions and all their instances are deleted after {{ttl}} hours.</strong></p>
+                </div>
+
+                <div flex></div>
+              </md-content>
+              <md-content flex layout="column" ng-repeat="instance in instances" ng-show="instance.name == selectedInstance.name" ngf-drop class="drop-box" ngf-drag-over-class="'dragover'" ngf-max-size="100000000" ngf-change="uploadFiles($files, $invalidFiles)" ngf-multiple="true">
+                  <md-card class="stats" md-theme="default" md-theme-watch>
+                      <md-card-title>
+                          <md-card-title-text>
+                              <span class="md-headline">{{instance.name}}</span>
+                          </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                          <div layout-gt-sm="row">
+                             <md-input-container class="md-icon-float md-block">
+                               <label>IP</label>
+                               <input ng-model="instance.ip" type="text" readonly="readonly">
+                             </md-input-container>
+                             <md-chips ng-model="instance.ports" name="port" readonly="true" md-removable="false">
+                               <md-chip-template>
+                               <strong><a href="{{getProxyUrl(instance, $chip)}}" title="{{getProxyUrl(instance, $chip)}}" target="_blank">{{$chip}}</a></strong>
+                               </md-chip-template>
+                             </md-chips>
+                             <md-chips ng-model="instance.swarmPorts" name="port" readonly="true" md-removable="false">
+                               <md-chip-template>
+                               <strong><a href="{{getProxyUrl(instance, $chip)}}" title="{{getProxyUrl(instance, $chip)}}" target="_blank">{{$chip}}</a></strong>
+                               </md-chip-template>
+                             </md-chips>
+                          </div>
+                          <div layout-gt-sm="row">
+                             <md-input-container class="md-block" flex-gt-sm>
+                               <label>Memory</label>
+                               <input ng-model="instance.mem" type="text" readonly="readonly">
+                             </md-input-container>
+                             <md-input-container class="md-block" flex-gt-sm>
+                               <label>CPU</label>
+                               <input ng-model="instance.cpu" type="text" readonly="readonly">
+                             </md-input-container>
+                          </div>
+                          <div layout-gt-sm="row">
+                            <md-input-container>
+                              <label>URL</label>
+                              <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly" size="50">
+                            </md-input-container>
+                            <div class="md-block" glex-gt-sm></div>
+                          </div>
+                      </md-card-content>
+                      <md-card-actions>
+                          <md-button class="md-warn md-raised" ng-click="deleteInstance(instance)" ng-disabled="isInstanceBeingDeleted">{{deleteInstanceBtnText}}</md-button>
+                          </md-card-actions>
+                  </md-card>
+                  <md-card flex md-theme="default" md-theme-watch >
+                      <div ng-show="uploadMessage" class="uploadStatus">
+                          <md-progress-linear  md-mode="determinate" value="{{uploadProgress}}"></md-progress-linear>
+                           <div class="bottom-block">
+                               <span>{{uploadMessage}}</span>
+                           </div>
+                      </div>
+                      <div ng-show="instance.status=='reconnect'" class="uploadStatus">Connection has been lost. Sometimes this happens when a windows instance is joining a swarm. Trying to reconnect terminal...</div>
+                      <id class="terminal-container container-{{instance.name}}">
+                          <div class="terminal-instance" id="terminal-{{instance.name}}"></div>
+                      </id>
+                  </md-card>
+              </md-content>
+            </section>
+        </div>
+
+        <script type="text/ng-template" id="settings-modal.html">
+            <md-toolbar md-theme="kube">
+                <div class="md-toolbar-tools">
+                    <h2>Settings</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="$ctrl.close()">
+                        <md-icon class="material-icon" aria-label="Close dialog">close</md-icon>
+                    </md-button>
+                </div>
+                </md-toolbar>
+
+                <md-dialog-content>
+                <div class="md-dialog-content" style="width:600px;">
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Keyboard Shortcut Preset</label>
+                                <md-select ng-model="$ctrl.currentShortcutConfig" ng-model-options="{getterSetter: true}" placeholder="Keyboard shortcut prefix">
+                                    <md-option ng-repeat="preset in $ctrl.keyboardShortcutPresets" value="{{preset}}">
+                                        {{preset.name}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div flex="10"></div>
+                        <div flex="40">
+                            <div ng-if="$ctrl.selectedShortcutPreset">
+                                Preset details:
+                                <ul>
+                                    <li ng-if="$ctrl.selectedShortcutPreset.presets.length == 0">No presets defined</li>
+                                    <li ng-repeat="preset in $ctrl.selectedShortcutPreset.presets">
+                                        <code>{{preset.command}}</code> - {{preset.description}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Instance Image</label>
+                                <md-select ng-model="$ctrl.currentDesiredInstanceImage" ng-model-options="{getterSetter: true}" placeholder="New Instance Image">
+                                    <md-option ng-repeat="image in $ctrl.instanceImages" value="{{image}}">
+                                        {{ image }}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Terminal Font Size</label>
+                                <md-select ng-model="$ctrl.currentTerminalFontSize" ng-model-options="{getterSetter: true}">
+                                    <md-option ng-repeat="size in $ctrl.terminalFontSizes" value="{{size}}">
+                                        {{ size }}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                    </div>
+                </div>
+                </md-dialog-content>
+
+                <md-dialog-actions layout="row">
+                    <span flex></span>
+                    <md-button ng-click="$ctrl.close()">
+                        Close
+                    </md-button>
+                </md-dialog-actions>
+        </script>
+
+	<script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js" integrity="sha384-FtJyC+/3fgtPbqlacLHdGwBrmPjKoYBsiqNF5/BEprsnIXB4xtXLCJRx7Xx+TWKP" crossorigin="anonymous"></script>
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+
+        <script src="https://unpkg.com/angular@1.5.5/angular.min.js"></script>
+        <script src="https://unpkg.com/angular-animate@1.5.5/angular-animate.min.js"></script>
+        <script src="https://unpkg.com/angular-aria@1.5.5/angular-aria.min.js"></script>
+        <script src="https://unpkg.com/angular-messages@1.5.5/angular-messages.min.js"></script>
+        <script src="https://unpkg.com/angular-material@1.1.0/angular-material.min.js"></script>
+        <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/master/dist/clipboard.min.js"></script>
+        <script src="https://unpkg.com/ngclipboard@2.0.0/dist/ngclipboard.min.js"></script>
+
+
+        <script src="https://unpkg.com/ng-file-upload@12.2.13/dist/ng-file-upload-all.min.js" integrity="sha384-NbBOS/QuqJqwWOtYg/L3ZDhgl/6GFyvkRMypJQLgoisMPtJiHj5uQ+3bj8V8Muwm" crossorigin="anonymous"></script>
+
+        <script src="/assets/xterm/xterm.js"></script>
+        <script src="/assets/xterm/addons/fit/fit.js"></script>
+        <script src="/assets/xterm/addons/fullscreen/fullscreen.js"></script>
+        <script src="/assets/setup-xterm.js"></script>
+        <script src="/assets/attach.js"></script>
+        <script src="https://unpkg.com/moment@2.16.0/min/moment.min.js"></script>
+        <script src="/assets/app.js"></script>
+
+        <script type="text/javascript" charset="utf-8">
+            window.onbeforeunload = function (e) {
+                e = e || window.event;
+
+                // For IE and Firefox prior to version 4
+                if (e) {
+                    e.returnValue = 'Make sure you saved your session URL';
+                }
+
+                // For Safari
+                return 'Make sure you saved your session URL';
+            };
+        </script>
+    </body>
 </html>
