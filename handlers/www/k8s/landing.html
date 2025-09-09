@@ -1,166 +1,343 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="PWDLanding" ng-controller="LoginController">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TD Kubernetes Labs - Interactive Learning Platform</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Kubernetes Learning Platform</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #326ce5;
+            --primary-dark: #295bc7;
+            --secondary: #ff6b6b;
+            --dark: #2d3748;
+            --light: #f8f9fa;
+            --gray: #718096;
+            --success: #48bb78;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        /* Header Styles */
+        .header {
+            padding: 1.5rem 0;
+            border-bottom: none;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .nav-pills .nav-link {
+            color: var(--dark);
+            font-weight: 500;
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-pills .nav-link:hover {
+            background-color: rgba(50, 108, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,247,250,0.9) 100%);
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 {
+            font-weight: 700;
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 50px;
+            padding: 0.7rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(50, 108, 229, 0.3);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            border-color: var(--success);
+            border-radius: 50px;
+            padding: 0.7rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background-color: #38a169;
+            border-color: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+        
+        .dropdown-menu {
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 0.5rem;
+        }
+        
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(50, 108, 229, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 3rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem 0;
+            color: var(--gray);
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+    
+    <!-- AngularJS -->
+    <script src="https://unpkg.com/angular@1.6.6/angular.min.js"></script>
+    <script src="https://unpkg.com/angular-cookies@1.6.6/angular-cookies.min.js"></script>
 </head>
+
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="logo">
-            <i class="fas fa-dharmachakra"></i>
-            <span>TD Kubernetes Labs</span>
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="header clearfix">
+            <nav class="d-flex justify-content-between align-items-center">
+                <a class="logo" href="#">
+                    <i class="fas fa-cubes logo-icon"></i>
+                    <span>Kubernetes Learning Platform</span>
+                </a>
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/play-with-docker/play-with-docker">
+                            <i class="fab fa-github me-1"></i> Contribute
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <div class="nav-links">
-            <a href="#features" class="nav-link">Features</a>
-            <a href="#getting-started" class="nav-link">Get Started</a>
-            <button class="btn btn-primary" onclick="startSession()">
-                <i class="fas fa-rocket"></i>
-                Start Learning
-            </button>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <i class="fas fa-cloud-upload-alt hero-icon"></i>
+            <h1 class="display-4">Master Kubernetes</h1>
+            <p class="lead">
+                A powerful, interactive playground to learn and experiment with Kubernetes in a safe sandbox environment.
+            </p>
+            
+            <div ng-hide="loggedIn" class="btn-group mb-3" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-sign-in-alt me-2"></i> Login
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                    <li ng-repeat="provider in providers">
+                        <a class="dropdown-item" ng-click="login(provider)">
+                            <i class="fab fa-{{provider.toLowerCase()}} me-2"></i> {{provider}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <form id="landingForm" method="POST" action="/">
+                <p ng-show="loggedIn">
+                    <a class="btn btn-success btn-lg" href="#" ng-click="start()" role="button">
+                        <i class="fas fa-play-circle me-2"></i> Start Learning
+                    </a>
+                </p>
+                <input id="stack" type="hidden" name="stack" value="">
+                <input id="stack_name" type="hidden" name="stack_name" value="">
+                <input id="image_name" type="hidden" name="image_name" value="">
+            </form>
         </div>
+
+        <!-- Features Section -->
+        <div class="features">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-bolt feature-icon"></i>
+                        <h3>Instant Setup</h3>
+                        <p>Get a full Kubernetes environment running in seconds without any complex installation or configuration.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h3>Safe Sandbox</h3>
+                        <p>Experiment freely in an isolated environment where you can't break anything - perfect for learning.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-graduation-cap feature-icon"></i>
+                        <h3>Hands-on Learning</h3>
+                        <p>Practice real Kubernetes commands and workflows with guided tutorials and examples.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description Section -->
+        <div class="row marketing">
+            <div class="col-lg-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <p class="card-text">
+                            Kubernetes Learning Platform is powered by the open-source Play with Kubernetes project. 
+                            It provides a playground which allows users to run K8s clusters in a matter of seconds. 
+                            It gives the experience of having a free Alpine Linux Virtual Machine in your browser. 
+                            Under the hood, Docker-in-Docker (DinD) is used to give the effect of multiple VMs/PCs.
+                        </p>
+                        <p class="card-text mt-3">
+                            If you want to learn more about Kubernetes, consider the
+                            <a href="https://training.play-with-kubernetes.com/">Kubernetes Learning Classroom</a>
+                            which provides more directed learning using an integrated commandline environment.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; Kubernetes Learning Platform 2023</p>
+        </footer>
     </div>
 
-    <!-- Hero Section -->
-    <div class="hero">
-        <i class="fas fa-dharmachakra hero-icon"></i>
-        <h1>Master Kubernetes in Your Browser</h1>
-        <p class="subtitle">
-            Experience hands-on Kubernetes learning with our interactive, browser-based playground. 
-            No installation required, no credit card needed. Start experimenting with real Kubernetes 
-            clusters in seconds.
-        </p>
-        
-        <div class="cta-section">
-            <button class="cta-button" onclick="startSession()">
-                Launch Free Playground
-            </button>
-        </div>
-    </div>
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Features Section -->
-    <div class="features" id="features">
-        <h2>Why Choose TD Kubernetes Labs?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-rocket"></i>
-                <h3>Instant Setup</h3>
-                <p>Get a fully working Kubernetes cluster in under 30 seconds. No downloads, no configuration, just pure learning.</p>
-            </div>
-            
-            <div class="feature-card">
-                <i class="fas fa-cubes"></i>
-                <h3>Real Kubernetes</h3>
-                <p>Work with actual kubectl commands, deploy real applications, and experience authentic Kubernetes workflows.</p>
-            </div>
-            
-            <div class="feature-card">
-                <i class="fas fa-users"></i>
-                <h3>Multi-Node Clusters</h3>
-                <p>Create and manage multi-node clusters with full networking capabilities and inter-pod communication.</p>
-            </div>
-            
-            <div class="feature-card">
-                <i class="fas fa-terminal"></i>
-                <h3>Full Terminal Access</h3>
-                <p>Complete command-line interface with kubectl, kubeadm, kubelet, and all essential Kubernetes tools pre-installed.</p>
-            </div>
-            
-            <div class="feature-card">
-                <i class="fas fa-chart-line"></i>
-                <h3>Resource Monitoring</h3>
-                <p>Real-time CPU and memory monitoring to understand resource usage and cluster performance.</p>
-            </div>
-            
-            <div class="feature-card">
-                <i class="fas fa-clock"></i>
-                <h3>Extended Sessions</h3>
-                <p>4-hour session duration gives you plenty of time to explore, experiment, and complete complex tutorials.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Getting Started Section -->
-    <div class="getting-started" id="getting-started">
-        <h2>Get Started in 3 Simple Steps</h2>
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Launch Environment</h3>
-                <p>Click "Start Learning" to create your free Kubernetes playground session.</p>
-            </div>
-            
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Create Instances</h3>
-                <p>Add Kubernetes nodes and start experimenting with real cluster operations.</p>
-            </div>
-            
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Start Learning</h3>
-                <p>Use kubectl commands, deploy applications, and master Kubernetes concepts hands-on.</p>
-            </div>
-        </div>
-        
-        <button class="btn btn-primary btn-large" onclick="startSession()">
-            <i class="fas fa-rocket"></i>
-            Start Your Kubernetes Journey
-        </button>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <div class="footer-content">
-            <div class="logo">
-                <i class="fas fa-dharmachakra"></i>
-                <span>TD Kubernetes Labs</span>
-            </div>
-            
-            <div class="footer-links">
-                <a href="#">About</a>
-                <!-- <a href="#">Documentation</a>
-                <a href="#">Tutorials</a>
-                <a href="#">Support</a>
-                <a href="#">Privacy</a> -->
-            </div>
-            
-        </div>
-        
-        <div style="text-align: center; margin-top: 20px; opacity: 0.7;">
-            <p>&copy; 2025 Kubernetes Lab by Tutorials Dojo | Based on Play with Kubernetes</p>
-        </div>
-    </div>
-
-    <script src="js/script.js"></script>
-
-    <script
-      crossorigin="anonymous"
-      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      crossorigin="anonymous"
-      src="https://unpkg.com/popper.js@1.11.0/dist/umd/popper.min.js"
-      integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      crossorigin="anonymous"
-      src="https://unpkg.com/bootstrap@4.0.0-beta/dist/js/bootstrap.min.js"
-      integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
-      crossorigin="anonymous"
-    ></script>
+    <!-- Angular Controller -->
     <script>
-    angular.module("PWDLanding", []).controller("LoginController", [
-      "$scope",
-      "$http",
-      "$window",
-      function ($scope, $http, $window) {
+    angular.module("PWDLanding", ['ngCookies']).controller("LoginController", [
+      "$scope", "$http", "$window", "$cookies", function ($scope, $http, $window, $cookies) {
         $scope.providers = [];
         $scope.loggedIn = false;
         $scope.user = null;
@@ -253,6 +430,6 @@
         };
       },
     ]);
-</script>
-  </body>
+    </script>
+</body>
 </html>
