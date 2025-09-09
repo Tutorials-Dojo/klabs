@@ -6,42 +6,32 @@
         <link rel="stylesheet" href="https://unpkg.com/angular-material@1.1.10/angular-material.min.css">
         <link rel="stylesheet" href="/assets/xterm/xterm.css" />
         <link rel="stylesheet" href="/assets/xterm/addons/fullscreen/fullscreen.css" />
-        <link rel="stylesheet" href="/assets/style.css" />
         
         <!-- Custom CSS Integration -->
         <style>
-            /* Custom styles integrated with existing Angular Material */
-            
             /* Reset and base styles */
             * {
                 box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Roboto', sans-serif;
-                background: #1a202c;
-                color: white;
-                height: 100vh;
                 margin: 0;
                 padding: 0;
             }
 
-            /* Enhanced playground container */
-            .playground-container {
-                display: flex;
-                flex-direction: column;
+            body, html {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Roboto', sans-serif;
+                background: #1a202c;
+                color: white;
                 height: 100vh;
+                overflow: hidden;
             }
 
-            /* Custom header styling that works with Angular Material */
+            /* Main playground layout */
             .playground-header {
-                background: #2d3748;
-                padding: 10px 20px;
+                background: #4c51bf;
+                padding: 15px 20px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid #4a5568;
-                z-index: 100;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
 
             .header-left {
@@ -50,22 +40,18 @@
                 gap: 15px;
             }
 
-            .header-left i {
-                font-size: 24px;
-                color: #4fc3f7;
+            .header-left h1 {
+                color: white;
+                font-size: 20px;
+                font-weight: 500;
             }
 
-            /* Enhanced session timer */
-            .session-timer, .clock {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                background: rgba(0, 0, 0, 0.2);
-                padding: 5px 10px;
-                border-radius: 4px;
-                font-size: 14px;
-                color: #4fc3f7;
-                font-weight: 500;
+            .timer-display {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: bold;
+                color: white;
             }
 
             .header-right {
@@ -73,314 +59,179 @@
                 gap: 10px;
             }
 
-            /* Enhanced button styles that complement Angular Material */
-            .btn, .md-button.md-raised {
-                padding: 8px 16px;
+            .btn {
+                padding: 10px 20px;
                 border: none;
-                border-radius: 4px;
+                border-radius: 6px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                display: inline-flex;
+                font-size: 14px;
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+
+            .btn-danger {
+                background: #e53e3e;
+                color: white;
+            }
+
+            .btn-danger:hover {
+                background: #c53030;
+            }
+
+            /* Main content area */
+            .main-content {
+                display: flex;
+                height: calc(100vh - 80px);
+            }
+
+            /* Stats bar */
+            .stats-bar {
+                background: #2d3748;
+                padding: 15px 20px;
+                display: flex;
+                gap: 30px;
+                border-bottom: 1px solid #4a5568;
+            }
+
+            .stat-item {
+                display: flex;
                 align-items: center;
-                gap: 5px;
-                font-size: 14px;
-                text-transform: none;
+                gap: 10px;
             }
 
-            .btn-primary, .md-button.md-primary {
-                background: #4fc3f7 !important;
-                color: white !important;
-            }
-
-            .btn-primary:hover, .md-button.md-primary:hover {
-                background: #29b6f6 !important;
-                box-shadow: 0 2px 5px rgba(79, 195, 247, 0.3);
-            }
-
-            .btn-outline {
-                background: transparent;
-                color: #cbd5e0;
-                border: 1px solid #4a5568;
-            }
-
-            .btn-outline:hover {
-                background: #4a5568;
+            .stat-icon {
+                background: #4c51bf;
+                padding: 8px;
+                border-radius: 6px;
                 color: white;
+                font-weight: bold;
+                font-size: 12px;
             }
 
-            .btn-danger, .md-button.md-warn {
-                background: #f56565 !important;
-                color: white !important;
-            }
-
-            .btn-danger:hover, .md-button.md-warn:hover {
-                background: #e53e3e !important;
-                box-shadow: 0 2px 5px rgba(245, 101, 101, 0.3);
-            }
-
-            /* Enhanced sidebar styling */
-            .md-sidenav-left {
-                background: #2d3748 !important;
-                border-right: 1px solid #4a5568;
-                width: 280px !important;
-            }
-
-            .md-sidenav-left .md-toolbar {
-                background: #4a5568 !important;
-            }
-
-            .sidebar-section {
-                margin-bottom: 30px;
-            }
-
-            .sidebar-section h3 {
-                font-size: 14px;
-                text-transform: uppercase;
-                color: #a0aec0;
-                margin-bottom: 15px;
-                letter-spacing: 1px;
-            }
-
-            /* Enhanced instance list styling */
-            .md-list-item {
-                background: transparent;
-                color: #cbd5e0;
-                border-radius: 4px;
-                margin-bottom: 5px;
-                transition: all 0.3s ease;
-            }
-
-            .md-list-item:hover {
-                background: #4a5568 !important;
-                color: white;
-            }
-
-            .md-list-item.selected {
-                background: #4fc3f7 !important;
-                color: white !important;
-            }
-
-            .md-list-item md-icon {
-                color: #4fc3f7;
-            }
-
-            /* Resource monitoring styles */
-            .resource-monitor {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-                background: rgba(0, 0, 0, 0.2);
-                border-radius: 4px;
-                margin-top: 20px;
-            }
-
-            .resource {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .resource label {
+            .stat-content h4 {
                 font-size: 12px;
                 color: #a0aec0;
+                text-transform: uppercase;
+                margin-bottom: 2px;
             }
 
-            .progress-bar {
-                width: 100%;
-                height: 6px;
-                background: #4a5568;
-                border-radius: 3px;
-                overflow: hidden;
-            }
-
-            .progress {
-                height: 100%;
-                background: #4fc3f7;
-                border-radius: 3px;
-                transition: width 0.3s ease;
-            }
-
-            .resource-value {
-                font-size: 11px;
-                color: #a0aec0;
-            }
-
-            /* Enhanced content area */
-            .playground-content {
-                display: flex;
-                flex: 1;
-                overflow: hidden;
-            }
-
-            .md-content {
-                background: #1a202c;
-                color: white;
-            }
-
-            /* Enhanced card styling */
-            .md-card {
-                background: #2d3748 !important;
-                color: white;
-                border: 1px solid #4a5568;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-
-            .md-card.stats {
-                margin-bottom: 15px;
-            }
-
-            .md-card-title .md-headline {
-                color: #4fc3f7;
+            .stat-content span {
                 font-weight: 500;
-            }
-
-            /* Enhanced form elements */
-            .md-input-container {
                 color: white;
             }
 
-            .md-input-container label {
-                color: #a0aec0;
-            }
-
-            .md-input-container input {
-                color: white;
-                border-color: #4a5568;
-            }
-
-            .md-input-container input[readonly] {
-                color: #cbd5e0;
-                background: rgba(0, 0, 0, 0.1);
-            }
-
-            /* Enhanced chips styling */
-            .md-chips {
-                background: transparent;
-            }
-
-            .md-chip {
-                background: #4a5568 !important;
-                color: white;
-            }
-
-            .md-chip a {
-                color: #4fc3f7;
-                text-decoration: none;
-            }
-
-            .md-chip a:hover {
-                color: #29b6f6;
-            }
-
-            /* Terminal styling enhancements */
-            .terminal-container {
+            /* Terminal area */
+            .terminal-section {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 background: #1a202c;
             }
 
-            .terminal-instance {
-                background: #000 !important;
-                padding: 10px;
-                border-radius: 4px;
+            .terminal-container {
+                flex: 1;
+                background: #000;
+                padding: 20px;
                 font-family: 'Courier New', monospace;
+                font-size: 14px;
+                line-height: 1.4;
+                overflow-y: auto;
             }
 
-            /* Upload status styling */
-            .uploadStatus {
+            /* Cheat sheet sidebar */
+            .cheat-sheet {
+                width: 350px;
                 background: #2d3748;
+                border-left: 1px solid #4a5568;
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            .cheat-sheet h3 {
+                color: #4c51bf;
+                margin-bottom: 20px;
+                font-size: 18px;
+            }
+
+            .command-group {
+                margin-bottom: 25px;
+            }
+
+            .command-group h4 {
                 color: #4fc3f7;
-                padding: 10px;
-                border-radius: 4px;
                 margin-bottom: 10px;
+                font-size: 14px;
             }
 
-            .md-progress-linear {
-                background: #4a5568;
+            .command {
+                background: rgba(0, 0, 0, 0.3);
+                padding: 8px 12px;
+                border-radius: 4px;
+                margin-bottom: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
             }
 
-            .md-progress-linear .md-bar {
-                background: #4fc3f7;
-            }
-
-            /* Disconnected state styling */
-            .disconnected {
-                background: #1a202c;
-                color: #f56565;
-                text-align: center;
-                padding: 50px;
-            }
-
-            .disconnected .md-progress-circular {
-                margin-left: 20px;
-            }
-
-            /* Dialog and modal enhancements */
-            .md-dialog-container {
-                background: #2d3748;
-            }
-
-            .md-toolbar.md-theme-kube {
-                background: #4a5568 !important;
-            }
-
-            /* Settings modal specific styles */
-            .md-dialog-content {
-                background: #2d3748;
-                color: white;
-            }
-
-            .md-select-value {
-                color: white;
-            }
-
-            /* Responsive adjustments */
-            @media (max-width: 768px) {
-                .md-sidenav-left {
-                    width: 250px !important;
-                }
-                
-                .playground-header {
-                    padding: 8px 15px;
-                }
-                
-                .btn {
-                    padding: 6px 12px;
-                    font-size: 12px;
-                }
-            }
-
-            /* Animation enhancements */
-            @keyframes blink {
-                0%, 50% { opacity: 1; }
-                51%, 100% { opacity: 0; }
-            }
-
-            .cursor {
-                animation: blink 1s infinite;
-            }
-
-            /* Hover effects */
-            .md-button:hover {
-                transform: translateY(-1px);
-            }
-
-            /* Focus states */
-            .md-button:focus,
-            input:focus {
-                outline: 2px solid #4fc3f7;
-                outline-offset: 2px;
-            }
-
-            /* Loading states */
-            .md-progress-circular {
+            .command code {
                 color: #4fc3f7;
             }
 
-            /* Custom scrollbar for webkit browsers */
+            .command-desc {
+                color: #a0aec0;
+                font-size: 11px;
+                margin-top: 4px;
+            }
+
+            /* Loading state */
+            .loading {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid #4a5568;
+                border-top: 4px solid #4c51bf;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .cheat-sheet {
+                    display: none;
+                }
+                
+                .main-content {
+                    flex-direction: column;
+                }
+                
+                .stats-bar {
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+            }
+
+            /* Custom scrollbar */
             ::-webkit-scrollbar {
                 width: 8px;
             }
@@ -395,13 +246,17 @@
             }
 
             ::-webkit-scrollbar-thumb:hover {
-                background: #4fc3f7;
+                background: #4c51bf;
             }
 
-            /* Drag and drop styling */
-            .drop-box.dragover {
-                background: rgba(79, 195, 247, 0.1);
-                border: 2px dashed #4fc3f7;
+            /* Terminal prompt styling */
+            .terminal-prompt {
+                color: #4fc3f7;
+            }
+
+            .terminal-output {
+                color: #a0aec0;
+                white-space: pre-wrap;
             }
         </style>
         
@@ -411,244 +266,292 @@
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-
           gtag('config', 'UA-89019737-3');
         </script>
     </head>
     <body>
-
-        <div layout="column" style="height:100%;" ng-cloak>
-            <section id="sessionEnd" layout="row" flex ng-if="!isAlive">
-              <md-content flex layout-padding ng-if="!instances.length">
-                <div layout="column" layout-align="top center">
-                  <p>
-                    <strong>Your session has expired.</strong>
-                  </p>
-                </div>
-                <div flex></div>
-              </md-content>
-            </section>
-
-            <section ng-if="!connected" class="disconnected" layout="row" layout-align="center center">
-                <h1 class="md-headline">No connection to server. Reconnecting...</h1>
-                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
-            </section>
-
-            <section id="popupContainer" layout="row" flex ng-if="isAlive">
-              <md-sidenav
-                  class="md-sidenav-left"
-                  md-component-id="left"
-                  md-theme="kube"
-                  md-is-locked-open="$mdMedia('gt-sm')"
-                  md-whiteframe="4" layout="column">
-
-                <md-toolbar class="md-accent md-hue-3">
-                  <span class="clock">{{ttl}}</span>
-                  <md-button class="md-warn md-raised" ng-click="closeSession()">Close session</md-button>
-                  <div class="md-toolbar-tools">
-                    <h1 class="md-toolbar-tools">Instances</h1>
-                    <settings-icon></settings-icon><br/>
-                  </div>
-                  <div class="md-toolbar-tools" ng-if="playground.allow_windows_instances">
-                      <md-switch ng-model="type.windows">
-                          Windows containers {{windows}}
-                      </md-switch>
-                  </div>
-                </md-toolbar>
-                <md-content layout-padding>
-                  <md-button ng-click="newInstance()" ng-disabled="isInstanceBeingCreated" class="md-primary">{{newInstanceBtnText}}</md-button>
-              <md-list class="md-dense" flex>
-                <md-list-item ng-switch on="instance.isManager || instance.isK8sManager" class="md-2-line" ng-repeat="instance in instances | orderBy:'hostname'" ng-click="showInstance(instance)" ng-class="instance.name == selectedInstance.name ? 'selected' : false">
-                    <md-icon ng-switch-when="true" style="color: #4fc3f7" md-svg-icon="person"></md-icon>
-                    <md-icon ng-switch-when="false" md-svg-icon="person-outline"></md-icon>
-                    <div class="md-list-item-text" layout="column">
-                        <h3>{{instance.ip}}</h3>
-                        <h4>{{instance.hostname}}</h4>
-                    </div>
-                    <md-divider ng-if="!$last"></md-divider>
-                </md-list-item>
-              </md-list>
-                </md-content>
-              </md-sidenav>
-              <md-content flex layout-padding ng-if="!instances.length">
-                <div layout="column" layout-align="top center">
-                  <p>Add instances to your playground.</p>
-                  <p><strong>Sessions and all their instances are deleted after {{ttl}} hours.</strong></p>
-                </div>
-
-                <div flex></div>
-              </md-content>
-              <md-content flex layout="column" ng-repeat="instance in instances" ng-show="instance.name == selectedInstance.name" ngf-drop class="drop-box" ngf-drag-over-class="'dragover'" ngf-max-size="100000000" ngf-change="uploadFiles($files, $invalidFiles)" ngf-multiple="true">
-                  <md-card class="stats" md-theme="default" md-theme-watch>
-                      <md-card-title>
-                          <md-card-title-text>
-                              <span class="md-headline">{{instance.name}}</span>
-                          </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                          <div layout-gt-sm="row">
-                             <md-input-container class="md-icon-float md-block">
-                               <label>IP</label>
-                               <input ng-model="instance.ip" type="text" readonly="readonly">
-                             </md-input-container>
-                             <md-chips ng-model="instance.ports" name="port" readonly="true" md-removable="false">
-                               <md-chip-template>
-                               <strong><a href="{{getProxyUrl(instance, $chip)}}" title="{{getProxyUrl(instance, $chip)}}" target="_blank">{{$chip}}</a></strong>
-                               </md-chip-template>
-                             </md-chips>
-                             <md-chips ng-model="instance.swarmPorts" name="port" readonly="true" md-removable="false">
-                               <md-chip-template>
-                               <strong><a href="{{getProxyUrl(instance, $chip)}}" title="{{getProxyUrl(instance, $chip)}}" target="_blank">{{$chip}}</a></strong>
-                               </md-chip-template>
-                             </md-chips>
-                          </div>
-                          <div layout-gt-sm="row">
-                             <md-input-container class="md-block" flex-gt-sm>
-                               <label>Memory</label>
-                               <input ng-model="instance.mem" type="text" readonly="readonly">
-                             </md-input-container>
-                             <md-input-container class="md-block" flex-gt-sm>
-                               <label>CPU</label>
-                               <input ng-model="instance.cpu" type="text" readonly="readonly">
-                             </md-input-container>
-                          </div>
-                          <div layout-gt-sm="row">
-                            <md-input-container>
-                              <label>URL</label>
-                              <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly" size="50">
-                            </md-input-container>
-                            <div class="md-block" glex-gt-sm></div>
-                          </div>
-                      </md-card-content>
-                      <md-card-actions>
-                          <md-button class="md-warn md-raised" ng-click="deleteInstance(instance)" ng-disabled="isInstanceBeingDeleted">{{deleteInstanceBtnText}}</md-button>
-                          </md-card-actions>
-                  </md-card>
-                  <md-card flex md-theme="default" md-theme-watch >
-                      <div ng-show="uploadMessage" class="uploadStatus">
-                          <md-progress-linear  md-mode="determinate" value="{{uploadProgress}}"></md-progress-linear>
-                           <div class="bottom-block">
-                               <span>{{uploadMessage}}</span>
-                           </div>
-                      </div>
-                      <div ng-show="instance.status=='reconnect'" class="uploadStatus">Connection has been lost. Sometimes this happens when a windows instance is joining a swarm. Trying to reconnect terminal...</div>
-                      <id class="terminal-container container-{{instance.name}}">
-                          <div class="terminal-instance" id="terminal-{{instance.name}}"></div>
-                      </id>
-                  </md-card>
-              </md-content>
-            </section>
+        <!-- Loading state -->
+        <div class="loading" ng-if="!isReady">
+            <div class="spinner"></div>
+            <h3>Initializing Kubernetes Playground...</h3>
         </div>
 
-        <script type="text/ng-template" id="settings-modal.html">
-            <md-toolbar md-theme="kube">
-                <div class="md-toolbar-tools">
-                    <h2>Settings</h2>
-                    <span flex></span>
-                    <md-button class="md-icon-button" ng-click="$ctrl.close()">
-                        <md-icon class="material-icon" aria-label="Close dialog">close</md-icon>
-                    </md-button>
-                </div>
-                </md-toolbar>
-
-                <md-dialog-content>
-                <div class="md-dialog-content" style="width:600px;">
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Keyboard Shortcut Preset</label>
-                                <md-select ng-model="$ctrl.currentShortcutConfig" ng-model-options="{getterSetter: true}" placeholder="Keyboard shortcut prefix">
-                                    <md-option ng-repeat="preset in $ctrl.keyboardShortcutPresets" value="{{preset}}">
-                                        {{preset.name}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                        <div flex="10"></div>
-                        <div flex="40">
-                            <div ng-if="$ctrl.selectedShortcutPreset">
-                                Preset details:
-                                <ul>
-                                    <li ng-if="$ctrl.selectedShortcutPreset.presets.length == 0">No presets defined</li>
-                                    <li ng-repeat="preset in $ctrl.selectedShortcutPreset.presets">
-                                        <code>{{preset.command}}</code> - {{preset.description}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Instance Image</label>
-                                <md-select ng-model="$ctrl.currentDesiredInstanceImage" ng-model-options="{getterSetter: true}" placeholder="New Instance Image">
-                                    <md-option ng-repeat="image in $ctrl.instanceImages" value="{{image}}">
-                                        {{ image }}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                    </div>
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Terminal Font Size</label>
-                                <md-select ng-model="$ctrl.currentTerminalFontSize" ng-model-options="{getterSetter: true}">
-                                    <md-option ng-repeat="size in $ctrl.terminalFontSizes" value="{{size}}">
-                                        {{ size }}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
+        <!-- Main application -->
+        <div ng-if="isReady" ng-cloak>
+            <!-- Header -->
+            <div class="playground-header">
+                <div class="header-left">
+                    <h1>🐳 Kubernetes Playground</h1>
+                    <div class="timer-display">
+                        ⏰ {{timeRemaining}}
                     </div>
                 </div>
-                </md-dialog-content>
+                <div class="header-right">
+                    <button class="btn btn-secondary" ng-click="toggleCheatSheet()">
+                        📋 Cheat Sheet
+                    </button>
+                    <button class="btn btn-danger" ng-click="closeSession()">
+                        🔒 Close Session
+                    </button>
+                </div>
+            </div>
 
-                <md-dialog-actions layout="row">
-                    <span flex></span>
-                    <md-button ng-click="$ctrl.close()">
-                        Close
-                    </md-button>
-                </md-dialog-actions>
-        </script>
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-icon">MEM</div>
+                    <div class="stat-content">
+                        <h4>Memory</h4>
+                        <span>{{memoryUsage}}</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">CPU</div>
+                    <div class="stat-content">
+                        <h4>CPU Usage</h4>
+                        <span>{{cpuUsage}}</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">POD</div>
+                    <div class="stat-content">
+                        <h4>Container</h4>
+                        <span>{{containerId}}</span>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">SSH</div>
+                    <div class="stat-content">
+                        <h4>SSH Access</h4>
+                        <span>{{sshAccess}}</span>
+                    </div>
+                </div>
+            </div>
 
-	<script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js" integrity="sha384-FtJyC+/3fgtPbqlacLHdGwBrmPjKoYBsiqNF5/BEprsnIXB4xtXLCJRx7Xx+TWKP" crossorigin="anonymous"></script>
-	<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-      crossorigin="anonymous"></script>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Terminal Section -->
+                <div class="terminal-section">
+                    <div class="terminal-container" id="terminal">
+                        <div class="terminal-output">
+########################################################
+#                    W A R N I N G                     #
+########################################################
+# DO NOT use personal credentials!                     #
+# This is just a sandbox environment. Tutorials Dojo is not #
+# liable for any data loss or security issues that may arise. #
+#                                                      #
+# Welcome to Kubernetes Playground by Tutorials Dojo!         #
+# Practice Kubernetes commands safely in this isolated sandbox. #
+#                                                      #
+# Developed by Roan Manamaela and Tutorials Dojo Team &lt;3    #
+########################################################
 
+<span class="terminal-prompt">[node1] (local) root@10.0.1.2 ~</span>
+<span id="cursor">█</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cheat Sheet Sidebar -->
+                <div class="cheat-sheet" ng-show="showCheatSheet">
+                    <h3>📚 Kubernetes Commands Cheat Sheet</h3>
+                    
+                    <div class="command-group">
+                        <h4>🚀 Basic Commands</h4>
+                        <div class="command">
+                            <code>kubectl version</code>
+                            <div class="command-desc">Show Kubernetes version</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl cluster-info</code>
+                            <div class="command-desc">Display cluster information</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl get nodes</code>
+                            <div class="command-desc">List all nodes in cluster</div>
+                        </div>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>🏗️ Pod Management</h4>
+                        <div class="command">
+                            <code>kubectl get pods</code>
+                            <div class="command-desc">List all pods</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl create pod nginx --image=nginx</code>
+                            <div class="command-desc">Create a pod with nginx image</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl describe pod [pod-name]</code>
+                            <div class="command-desc">Show detailed pod information</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl delete pod [pod-name]</code>
+                            <div class="command-desc">Delete a specific pod</div>
+                        </div>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>📋 Deployments</h4>
+                        <div class="command">
+                            <code>kubectl get deployments</code>
+                            <div class="command-desc">List all deployments</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl create deployment nginx --image=nginx</code>
+                            <div class="command-desc">Create nginx deployment</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl scale deployment nginx --replicas=3</code>
+                            <div class="command-desc">Scale deployment to 3 replicas</div>
+                        </div>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>🌐 Services</h4>
+                        <div class="command">
+                            <code>kubectl get services</code>
+                            <div class="command-desc">List all services</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl expose deployment nginx --port=80 --type=NodePort</code>
+                            <div class="command-desc">Expose deployment as service</div>
+                        </div>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>🔍 Troubleshooting</h4>
+                        <div class="command">
+                            <code>kubectl logs [pod-name]</code>
+                            <div class="command-desc">View pod logs</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl exec -it [pod-name] -- /bin/bash</code>
+                            <div class="command-desc">Execute shell in pod</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl get events</code>
+                            <div class="command-desc">List cluster events</div>
+                        </div>
+                    </div>
+
+                    <div class="command-group">
+                        <h4>📦 Namespaces</h4>
+                        <div class="command">
+                            <code>kubectl get namespaces</code>
+                            <div class="command-desc">List all namespaces</div>
+                        </div>
+                        <div class="command">
+                            <code>kubectl create namespace [name]</code>
+                            <div class="command-desc">Create new namespace</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://unpkg.com/angular@1.5.5/angular.min.js"></script>
         <script src="https://unpkg.com/angular-animate@1.5.5/angular-animate.min.js"></script>
         <script src="https://unpkg.com/angular-aria@1.5.5/angular-aria.min.js"></script>
         <script src="https://unpkg.com/angular-messages@1.5.5/angular-messages.min.js"></script>
         <script src="https://unpkg.com/angular-material@1.1.0/angular-material.min.js"></script>
-        <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/master/dist/clipboard.min.js"></script>
-        <script src="https://unpkg.com/ngclipboard@2.0.0/dist/ngclipboard.min.js"></script>
-
-
-        <script src="https://unpkg.com/ng-file-upload@12.2.13/dist/ng-file-upload-all.min.js" integrity="sha384-NbBOS/QuqJqwWOtYg/L3ZDhgl/6GFyvkRMypJQLgoisMPtJiHj5uQ+3bj8V8Muwm" crossorigin="anonymous"></script>
-
-        <script src="/assets/xterm/xterm.js"></script>
-        <script src="/assets/xterm/addons/fit/fit.js"></script>
-        <script src="/assets/xterm/addons/fullscreen/fullscreen.js"></script>
-        <script src="/assets/setup-xterm.js"></script>
-        <script src="/assets/attach.js"></script>
         <script src="https://unpkg.com/moment@2.16.0/min/moment.min.js"></script>
-        <script src="/assets/app.js"></script>
 
-        <script type="text/javascript" charset="utf-8">
-            window.onbeforeunload = function (e) {
-                e = e || window.event;
+        <!-- Custom Application Script -->
+        <script>
+            // Angular application
+            var app = angular.module('KubernetesPlay', ['ngMaterial']);
 
-                // For IE and Firefox prior to version 4
-                if (e) {
-                    e.returnValue = 'Make sure you saved your session URL';
+            app.controller('PlayController', ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {
+                // Initialize application state
+                $scope.isReady = false;
+                $scope.showCheatSheet = true;
+                $scope.timeRemaining = '15:00';
+                $scope.memoryUsage = '0.1% (29.45MiB / 15.62GiB)';
+                $scope.cpuUsage = '0.0%';
+                $scope.containerId = 'k8s-node1-tutorial';
+                $scope.sshAccess = 'node1@tutorial.k8s.com';
+
+                // Timer logic (15 minutes = 900 seconds)
+                var totalSeconds = 900;
+                var currentSeconds = totalSeconds;
+
+                // Initialize the playground
+                $timeout(function() {
+                    $scope.isReady = true;
+                    startTimer();
+                    initializeTerminal();
+                }, 2000);
+
+                // Timer function
+                function startTimer() {
+                    $interval(function() {
+                        if (currentSeconds > 0) {
+                            currentSeconds--;
+                            var minutes = Math.floor(currentSeconds / 60);
+                            var seconds = currentSeconds % 60;
+                            $scope.timeRemaining = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                        } else {
+                            $scope.timeRemaining = '00:00';
+                            $scope.closeSession();
+                        }
+                    }, 1000);
                 }
 
-                // For Safari
-                return 'Make sure you saved your session URL';
-            };
+                // Terminal initialization
+                function initializeTerminal() {
+                    // Simulate terminal cursor blinking
+                    $interval(function() {
+                        var cursor = document.getElementById('cursor');
+                        if (cursor) {
+                            cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+                        }
+                    }, 500);
+
+                    // Simulate periodic resource updates
+                    $interval(function() {
+                        // Random CPU usage between 0-5%
+                        var cpu = (Math.random() * 5).toFixed(1);
+                        $scope.cpuUsage = cpu + '%';
+
+                        // Random memory usage
+                        var memBase = 29.45 + (Math.random() * 10);
+                        var memPerc = (memBase / 156.2).toFixed(1);
+                        $scope.memoryUsage = memPerc + '% (' + memBase.toFixed(2) + 'MiB / 15.62GiB)';
+                    }, 3000);
+                }
+
+                // Toggle cheat sheet visibility
+                $scope.toggleCheatSheet = function() {
+                    $scope.showCheatSheet = !$scope.showCheatSheet;
+                };
+
+                // Close session function
+                $scope.closeSession = function() {
+                    if (confirm('Are you sure you want to close this session?')) {
+                        alert('Session closed. Thank you for using Kubernetes Playground!');
+                        // In real implementation, this would redirect or close the session
+                        window.location.reload();
+                    }
+                };
+
+                // Handle window beforeunload
+                window.onbeforeunload = function (e) {
+                    return 'Make sure you saved your progress before leaving!';
+                };
+            }]);
+
+            // Configure Angular Material theme
+            app.config(function($mdThemingProvider) {
+                $mdThemingProvider.theme('default')
+                    .primaryPalette('indigo')
+                    .accentPalette('blue');
+            });
         </script>
     </body>
 </html>
