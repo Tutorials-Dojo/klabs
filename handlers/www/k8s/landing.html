@@ -247,21 +247,9 @@
                 A powerful, interactive playground to learn and experiment with Kubernetes in a safe sandbox environment.
             </p>
             
-            <div ng-hide="loggedIn" class="btn-group mb-3" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-sign-in-alt me-2"></i> Login
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                    <li ng-repeat="provider in providers">
-                        <a class="dropdown-item" ng-click="login(provider)">
-                            <i class="fab fa-{{provider.toLowerCase()}} me-2"></i> {{provider}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
             
             <form id="landingForm" method="POST" action="/">
-                <p ng-show="loggedIn">
+                <p>
                     <a class="btn btn-success btn-lg" href="#" ng-click="start()" role="button">
                         <i class="fas fa-play-circle me-2"></i> Start Learning
                     </a>
