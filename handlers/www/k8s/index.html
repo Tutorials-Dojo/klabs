@@ -1,265 +1,445 @@
 <!doctype html>
-<html ng-app="KubernetesPlay" ng-controller="PlayController">
+<html ng-app="DockerPlay" ng-controller="PlayController">
     <head>
         <title>Kubernetes Playground</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons" />
         <link rel="stylesheet" href="https://unpkg.com/angular-material@1.1.10/angular-material.min.css">
         <link rel="stylesheet" href="/assets/xterm/xterm.css" />
-        <link rel="stylesheet" href="/assets/xterm/addons/fullscreen/fullscreen.css" />
-        
-        <!-- Custom CSS Integration -->
+         <link rel="stylesheet" href="/assets/xterm/addons/fullscreen/fullscreen.css" />
+        <!-- Custom CSS for Kubernetes styling -->
         <style>
-            /* Reset and base styles */
-            * {
-                box-sizing: border-box;
+            /* Global Kubernetes theme */
+            body {
+                font-family: 'Roboto', sans-serif;
                 margin: 0;
                 padding: 0;
-            }
-
-            body, html {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Roboto', sans-serif;
-                background: #1a202c;
-                color: white;
+                background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
                 height: 100vh;
                 overflow: hidden;
             }
 
-            /* Main playground layout */
-            .playground-header {
-                background: #4c51bf;
-                padding: 15px 20px;
+            /* Header styling */
+            .main-header {
+                background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+                color: white;
+                padding: 16px 24px;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                justify-content: space-between;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                z-index: 1000;
+                position: relative;
             }
 
             .header-left {
                 display: flex;
                 align-items: center;
-                gap: 15px;
+                gap: 16px;
             }
 
-            .header-left h1 {
-                color: white;
-                font-size: 20px;
+            .k8s-logo {
+                width: 32px;
+                height: 32px;
+                background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJMMjggMTBWMjJMMTYgMzBMNCAyMlYxMEwxNiAyWiIgZmlsbD0iIzMyNkNFNSIvPgo8cGF0aCBkPSJNMTYgNkwyNC44IDEyVjIwTDE2IDI2TDcuMiAyMFYxMkwxNiA2WiIgZmlsbD0id2hpdGUiLz4KPHA+PC9wYXRoPgo8L3N2Zz4K') center/contain no-repeat;
+            }
+
+            .header-title {
+                font-size: 24px;
                 font-weight: 500;
-            }
-
-            .timer-display {
-                background: rgba(255, 255, 255, 0.2);
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-weight: bold;
-                color: white;
+                margin: 0;
             }
 
             .header-right {
                 display: flex;
-                gap: 10px;
+                align-items: center;
+                gap: 16px;
             }
 
-            .btn {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 6px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                font-size: 14px;
+            .timer-display {
+                font-family: 'Roboto Mono', monospace;
+                font-size: 18px;
+                font-weight: bold;
+                background: rgba(255,255,255,0.2);
+                padding: 8px 16px;
+                border-radius: 20px;
+                min-width: 80px;
+                text-align: center;
             }
 
-            .btn-secondary {
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
+            .close-session-btn {
+                background: #f44336 !important;
+                color: white !important;
+                border: none !important;
+                padding: 10px 20px !important;
+                border-radius: 6px !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
             }
 
-            .btn-secondary:hover {
-                background: rgba(255, 255, 255, 0.3);
+            .close-session-btn:hover {
+                background: #d32f2f !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
             }
 
-            .btn-danger {
-                background: #e53e3e;
-                color: white;
-            }
-
-            .btn-danger:hover {
-                background: #c53030;
-            }
-
-            /* Main content area */
+            /* Main content layout */
             .main-content {
                 display: flex;
-                height: calc(100vh - 80px);
+                height: calc(100vh - 72px);
             }
 
-            /* Stats bar */
-            .stats-bar {
-                background: #2d3748;
-                padding: 15px 20px;
-                display: flex;
-                gap: 30px;
-                border-bottom: 1px solid #4a5568;
-            }
-
-            .stat-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .stat-icon {
-                background: #4c51bf;
-                padding: 8px;
-                border-radius: 6px;
-                color: white;
-                font-weight: bold;
-                font-size: 12px;
-            }
-
-            .stat-content h4 {
-                font-size: 12px;
-                color: #a0aec0;
-                text-transform: uppercase;
-                margin-bottom: 2px;
-            }
-
-            .stat-content span {
-                font-weight: 500;
-                color: white;
-            }
-
-            /* Terminal area */
-            .terminal-section {
-                flex: 1;
+            /* Sidebar styling */
+            .sidebar {
+                width: 300px;
+                background: white;
+                border-right: 1px solid #e0e0e0;
                 display: flex;
                 flex-direction: column;
-                background: #1a202c;
+                box-shadow: 2px 0 8px rgba(0,0,0,0.1);
             }
 
-            .terminal-container {
-                flex: 1;
-                background: #000;
+            .sidebar-header {
                 padding: 20px;
-                font-family: 'Courier New', monospace;
-                font-size: 14px;
-                line-height: 1.4;
-                overflow-y: auto;
+                border-bottom: 1px solid #e0e0e0;
+                background: #f8f9fa;
             }
 
-            /* Cheat sheet sidebar */
-            .cheat-sheet {
-                width: 350px;
-                background: #2d3748;
-                border-left: 1px solid #4a5568;
-                padding: 20px;
-                overflow-y: auto;
-            }
-
-            .cheat-sheet h3 {
-                color: #4c51bf;
-                margin-bottom: 20px;
+            .sidebar-title {
                 font-size: 18px;
+                font-weight: 600;
+                margin: 0 0 16px 0;
+                color: #1a237e;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
-            .command-group {
-                margin-bottom: 25px;
+            .add-instance-btn {
+                background: #4caf50 !important;
+                color: white !important;
+                width: 100%;
+                padding: 12px !important;
+                border-radius: 6px !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
             }
 
-            .command-group h4 {
-                color: #4fc3f7;
-                margin-bottom: 10px;
-                font-size: 14px;
+            .add-instance-btn:hover {
+                background: #43a047 !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
             }
 
-            .command {
-                background: rgba(0, 0, 0, 0.3);
-                padding: 8px 12px;
-                border-radius: 4px;
-                margin-bottom: 8px;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
+            .add-instance-btn:disabled {
+                background: #cccccc !important;
+                transform: none !important;
+                box-shadow: none !important;
             }
 
-            .command code {
-                color: #4fc3f7;
+            .instances-list {
+                flex: 1;
+                overflow-y: auto;
+                padding: 0;
             }
 
-            .command-desc {
-                color: #a0aec0;
-                font-size: 11px;
-                margin-top: 4px;
+            .instance-item {
+                padding: 16px 20px;
+                border-bottom: 1px solid #f0f0f0;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 12px;
             }
 
-            /* Loading state */
-            .loading {
+            .instance-item:hover {
+                background: #f5f5f5;
+            }
+
+            .instance-item.selected {
+                background: #e3f2fd;
+                border-left: 4px solid #1976d2;
+            }
+
+            .instance-icon {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: #1976d2;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 100vh;
+                color: white;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .instance-icon.manager {
+                background: #2196f3;
+            }
+
+            .instance-info h3 {
+                margin: 0 0 4px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+            }
+
+            .instance-info h4 {
+                margin: 0;
+                font-size: 12px;
+                color: #666;
+                font-weight: normal;
+            }
+
+            /* Terminal area styling */
+            .terminal-area {
+                flex: 1;
+                display: flex;
                 flex-direction: column;
-                gap: 20px;
+                background: white;
             }
 
-            .spinner {
-                width: 40px;
-                height: 40px;
-                border: 4px solid #4a5568;
-                border-top: 4px solid #4c51bf;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
+            .welcome-screen {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 40px;
+                color: #666;
             }
 
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+            .welcome-screen h2 {
+                color: #1a237e;
+                margin-bottom: 16px;
+                font-weight: 500;
             }
 
-            /* Responsive */
-            @media (max-width: 768px) {
-                .cheat-sheet {
-                    display: none;
-                }
-                
-                .main-content {
-                    flex-direction: column;
-                }
-                
-                .stats-bar {
-                    flex-wrap: wrap;
-                    gap: 15px;
-                }
+            .welcome-screen p {
+                margin-bottom: 8px;
+                line-height: 1.6;
             }
 
-            /* Custom scrollbar */
-            ::-webkit-scrollbar {
-                width: 8px;
+            .welcome-screen .session-info {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 16px;
+                margin-top: 20px;
+                color: #856404;
             }
 
-            ::-webkit-scrollbar-track {
-                background: #2d3748;
+            /* Instance details card */
+            .instance-card {
+                background: white;
+                margin: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                overflow: hidden;
             }
 
-            ::-webkit-scrollbar-thumb {
-                background: #4a5568;
+            .instance-card-header {
+                background: #f8f9fa;
+                padding: 20px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .instance-card-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: #1a237e;
+                margin: 0 0 16px 0;
+            }
+
+            .instance-details {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+
+            .detail-item label {
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                color: #666;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+            }
+
+            .detail-item input {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #e0e0e0;
                 border-radius: 4px;
+                font-size: 14px;
+                background: #f8f9fa;
             }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #4c51bf;
+            .port-chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 8px;
             }
 
-            /* Terminal prompt styling */
-            .terminal-prompt {
-                color: #4fc3f7;
+            .port-chip {
+                background: #1976d2;
+                color: white;
+                padding: 4px 12px;
+                border-radius: 16px;
+                font-size: 12px;
+                font-weight: 500;
+                text-decoration: none;
+                transition: background 0.2s ease;
             }
 
-            .terminal-output {
-                color: #a0aec0;
-                white-space: pre-wrap;
+            .port-chip:hover {
+                background: #1565c0;
+                color: white;
+                text-decoration: none;
+            }
+
+            .instance-actions {
+                padding: 20px;
+                border-top: 1px solid #e0e0e0;
+                display: flex;
+                gap: 12px;
+            }
+
+            .delete-instance-btn {
+                background: #f44336 !important;
+                color: white !important;
+                padding: 10px 20px !important;
+                border-radius: 6px !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .delete-instance-btn:hover {
+                background: #d32f2f !important;
+            }
+
+            .delete-instance-btn:disabled {
+                background: #cccccc !important;
+            }
+
+            .cheat-sheet-btn {
+                background: #2196f3 !important;
+                color: white !important;
+                padding: 10px 20px !important;
+                border-radius: 6px !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .cheat-sheet-btn:hover {
+                background: #1976d2 !important;
+            }
+
+            .settings-btn {
+                background: transparent !important;
+                color: white !important;
+                min-width: 40px !important;
+                padding: 8px !important;
+                border-radius: 50% !important;
+            }
+
+            /* Terminal container */
+            .terminal-container {
+                flex: 1;
+                padding: 20px;
+                background: #1e1e1e;
+            }
+
+            .terminal-instance {
+                width: 100%;
+                height: 100%;
+                background: #1e1e1e;
+            }
+
+            /* Upload progress */
+            .upload-status {
+                padding: 16px 20px;
+                background: #e3f2fd;
+                border-bottom: 1px solid #bbdefb;
+            }
+
+            /* Session ended screen */
+            .session-ended {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white;
+            }
+
+            .session-ended-content {
+                text-align: center;
+                padding: 40px;
+            }
+
+            .session-ended h2 {
+                color: #f44336;
+                margin-bottom: 16px;
+            }
+
+            /* Disconnected screen */
+            .disconnected {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                color: white;
+            }
+
+            .disconnected h1 {
+                margin-right: 20px;
+            }
+
+            /* Responsive design */
+            @media (max-width: 768px) {
+                .sidebar {
+                    width: 100%;
+                    max-width: 300px;
+                    position: absolute;
+                    left: -100%;
+                    transition: left 0.3s ease;
+                    z-index: 1000;
+                }
+
+                .sidebar.open {
+                    left: 0;
+                }
+
+                .header-title {
+                    font-size: 18px;
+                }
+
+                .timer-display {
+                    font-size: 14px;
+                    padding: 6px 12px;
+                }
+            }
+
+            /* Hide Angular Material default styling conflicts */
+            md-sidenav {
+                display: none !important;
+            }
+
+            .drop-box.dragover {
+                background: rgba(33, 150, 243, 0.1);
+                border: 2px dashed #2196f3;
             }
         </style>
-        
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89019737-3"></script>
         <script>
@@ -270,288 +450,412 @@
         </script>
     </head>
     <body>
-        <!-- Loading state -->
-        <div class="loading" ng-if="!isReady">
-            <div class="spinner"></div>
-            <h3>Initializing Kubernetes Playground...</h3>
+        <!-- Main Container -->
+        <div layout="column" style="height:100%;" ng-cloak>
+            
+            <!-- Session Ended Screen -->
+            <section id="sessionEnd" ng-if="!isAlive" class="session-ended">
+              <div class="session-ended-content" ng-if="!instances.length">
+                <h2>Your session has expired.</h2>
+                <p>Please start a new session to continue.</p>
+              </div>
+            </section>
+
+            <!-- Disconnected Screen -->
+            <section ng-if="!connected" class="disconnected">
+                <h1>No connection to server. Reconnecting...</h1>
+                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
+            </section>
+
+            <!-- Main Application -->
+            <section ng-if="isAlive">
+                <!-- Header -->
+                <div class="main-header">
+                    <div class="header-left">
+                        <div class="k8s-logo"></div>
+                        <h1 class="header-title">Kubernetes Playground</h1>
+                    </div>
+                    <div class="header-right">
+                        <div class="timer-display">{{ttl}}</div>
+                        <button class="close-session-btn" ng-click="closeSession()">Close Session</button>
+                        <button class="settings-btn" ng-click="showSettings()">
+                            <md-icon>settings</md-icon>
+                        </button>
+                        <button class="cheat-sheet-btn" ng-click="showCheatSheet()">Cheat Sheet</button>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Sidebar -->
+                    <div class="sidebar">
+                        <div class="sidebar-header">
+                            <div class="sidebar-title">
+                                <md-icon>computer</md-icon>
+                                Instances
+                            </div>
+                            <button class="add-instance-btn" ng-click="newInstance()" ng-disabled="isInstanceBeingCreated">
+                                {{newInstanceBtnText || 'Add New Instance'}}
+                            </button>
+                            <div ng-if="playground.allow_windows_instances" style="margin-top: 12px;">
+                                <md-switch ng-model="type.windows">
+                                    Windows containers
+                                </md-switch>
+                            </div>
+                        </div>
+                        
+                        <div class="instances-list">
+                            <div ng-repeat="instance in instances | orderBy:'hostname'" 
+                                 class="instance-item" 
+                                 ng-class="instance.name == selectedInstance.name ? 'selected' : ''"
+                                 ng-click="showInstance(instance)">
+                                <div class="instance-icon" ng-class="(instance.isManager || instance.isK8sManager) ? 'manager' : ''">
+                                    {{instance.isManager || instance.isK8sManager ? 'M' : 'W'}}
+                                </div>
+                                <div class="instance-info">
+                                    <h3>{{instance.ip}}</h3>
+                                    <h4>{{instance.hostname}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terminal Area -->
+                    <div class="terminal-area">
+                        <!-- Welcome Screen -->
+                        <div ng-if="!instances.length" class="welcome-screen">
+                            <h2>Welcome to Kubernetes Playground</h2>
+                            <p>Add instances to your playground to get started.</p>
+                            <div class="session-info">
+                                <strong>Sessions and all their instances are deleted after {{ttl}} hours.</strong>
+                            </div>
+                        </div>
+
+                        <!-- Instance Content -->
+                        <div ng-repeat="instance in instances" 
+                             ng-show="instance.name == selectedInstance.name" 
+                             ngf-drop class="drop-box" 
+                             ngf-drag-over-class="'dragover'" 
+                             ngf-max-size="100000000" 
+                             ngf-change="uploadFiles($files, $invalidFiles)" 
+                             ngf-multiple="true"
+                             style="height: 100%; display: flex; flex-direction: column;">
+                            
+                            <!-- Instance Details Card -->
+                            <div class="instance-card">
+                                <div class="instance-card-header">
+                                    <div class="instance-card-title">{{instance.name}}</div>
+                                    <div class="instance-details">
+                                        <div class="detail-item">
+                                            <label>IP Address</label>
+                                            <input ng-model="instance.ip" type="text" readonly="readonly">
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Memory</label>
+                                            <input ng-model="instance.mem" type="text" readonly="readonly">
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>CPU</label>
+                                            <input ng-model="instance.cpu" type="text" readonly="readonly">
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Direct URL</label>
+                                            <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly">
+                                        </div>
+                                    </div>
+                                    <div ng-if="instance.ports.length" class="detail-item">
+                                        <label>Exposed Ports</label>
+                                        <div class="port-chips">
+                                            <a ng-repeat="port in instance.ports" 
+                                               href="{{getProxyUrl(instance, port)}}" 
+                                               target="_blank" 
+                                               class="port-chip">{{port}}</a>
+                                        </div>
+                                    </div>
+                                    <div ng-if="instance.swarmPorts.length" class="detail-item">
+                                        <label>Swarm Ports</label>
+                                        <div class="port-chips">
+                                            <a ng-repeat="port in instance.swarmPorts" 
+                                               href="{{getProxyUrl(instance, port)}}" 
+                                               target="_blank" 
+                                               class="port-chip">{{port}}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="instance-actions">
+                                    <button class="delete-instance-btn" ng-click="deleteInstance(instance)" ng-disabled="isInstanceBeingDeleted">
+                                        {{deleteInstanceBtnText || 'Delete Instance'}}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Upload Progress -->
+                            <div ng-show="uploadMessage" class="upload-status">
+                                <md-progress-linear md-mode="determinate" value="{{uploadProgress}}"></md-progress-linear>
+                                <div style="margin-top: 8px;">
+                                    <span>{{uploadMessage}}</span>
+                                </div>
+                            </div>
+
+                            <!-- Reconnection Status -->
+                            <div ng-show="instance.status=='reconnect'" class="upload-status">
+                                Connection has been lost. Sometimes this happens when a windows instance is joining a swarm. Trying to reconnect terminal...
+                            </div>
+
+                            <!-- Terminal -->
+                            <div class="terminal-container container-{{instance.name}}" style="flex: 1;">
+                                <div class="terminal-instance" id="terminal-{{instance.name}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hidden original sidenav for Angular Material compatibility -->
+            <md-sidenav
+                class="md-sidenav-left"
+                md-component-id="left"
+                md-theme="kube"
+                md-is-locked-open="false"
+                md-whiteframe="4" 
+                style="display: none;">
+                <md-toolbar class="md-accent md-hue-3">
+                  <span class="clock">{{ttl}}</span>
+                  <md-button class="md-warn md-raised" ng-click="closeSession()">Close session</md-button>
+                  <div class="md-toolbar-tools">
+                    <h1 class="md-toolbar-tools">Instances</h1>
+                    <settings-icon></settings-icon><br/>
+                  </div>
+                  <div class="md-toolbar-tools" ng-if="playground.allow_windows_instances">
+                      <md-switch ng-model="type.windows">
+                          Windows containers {{windows}}
+                      </md-switch>
+                  </div>
+                </md-toolbar>
+                <md-content layout-padding>
+                  <md-button ng-click="newInstance()" ng-disabled="isInstanceBeingCreated" class="md-primary">{{newInstanceBtnText}}</md-button>
+                  <md-list class="md-dense" flex>
+                    <md-list-item ng-switch on="instance.isManager || instance.isK8sManager" class="md-2-line" ng-repeat="instance in instances | orderBy:'hostname'" ng-click="showInstance(instance)" ng-class="instance.name == selectedInstance.name ? 'selected' : false">
+                        <md-icon ng-switch-when="true" style="color: blue" md-svg-icon="person"></md-icon>
+                        <md-icon ng-switch-when="false" md-svg-icon="person-outline"></md-icon>
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{instance.ip}}</h3>
+                            <h4>{{instance.hostname}}</h4>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                    </md-list-item>
+                  </md-list>
+                </md-content>
+            </md-sidenav>
         </div>
 
-        <!-- Main application -->
-        <div ng-if="isReady" ng-cloak>
-            <!-- Header -->
-            <div class="playground-header">
-                <div class="header-left">
-                    <h1>🐳 Kubernetes Playground</h1>
-                    <div class="timer-display">
-                        ⏰ {{timeRemaining}}
-                    </div>
+        <!-- Settings Modal Template -->
+        <script type="text/ng-template" id="settings-modal.html">
+            <md-toolbar md-theme="kube">
+                <div class="md-toolbar-tools">
+                    <h2>Settings</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="$ctrl.close()">
+                        <md-icon class="material-icon" aria-label="Close dialog">close</md-icon>
+                    </md-button>
                 </div>
-                <div class="header-right">
-                    <button class="btn btn-secondary" ng-click="toggleCheatSheet()">
-                        📋 Cheat Sheet
-                    </button>
-                    <button class="btn btn-danger" ng-click="closeSession()">
-                        🔒 Close Session
-                    </button>
-                </div>
-            </div>
+            </md-toolbar>
 
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-icon">MEM</div>
-                    <div class="stat-content">
-                        <h4>Memory</h4>
-                        <span>{{memoryUsage}}</span>
+            <md-dialog-content>
+                <div class="md-dialog-content" style="width:600px;">
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Keyboard Shortcut Preset</label>
+                                <md-select ng-model="$ctrl.currentShortcutConfig" ng-model-options="{getterSetter: true}" placeholder="Keyboard shortcut prefix">
+                                    <md-option ng-repeat="preset in $ctrl.keyboardShortcutPresets" value="{{preset}}">
+                                        {{preset.name}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div flex="10"></div>
+                        <div flex="40">
+                            <div ng-if="$ctrl.selectedShortcutPreset">
+                                Preset details:
+                                <ul>
+                                    <li ng-if="$ctrl.selectedShortcutPreset.presets.length == 0">No presets defined</li>
+                                    <li ng-repeat="preset in $ctrl.selectedShortcutPreset.presets">
+                                        <code>{{preset.command}}</code> - {{preset.description}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">CPU</div>
-                    <div class="stat-content">
-                        <h4>CPU Usage</h4>
-                        <span>{{cpuUsage}}</span>
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Instance Image</label>
+                                <md-select ng-model="$ctrl.currentDesiredInstanceImage" ng-model-options="{getterSetter: true}" placeholder="New Instance Image">
+                                    <md-option ng-repeat="image in $ctrl.instanceImages" value="{{image}}">
+                                        {{ image }}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">POD</div>
-                    <div class="stat-content">
-                        <h4>Container</h4>
-                        <span>{{containerId}}</span>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">SSH</div>
-                    <div class="stat-content">
-                        <h4>SSH Access</h4>
-                        <span>{{sshAccess}}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Terminal Section -->
-                <div class="terminal-section">
-                    <div class="terminal-container" id="terminal">
-                        <div class="terminal-output">
-###################################################################
-#                         W A R N I N G                           #
-###################################################################
-# DO NOT use personal credentials!                                #
-# This is just a sandbox environment. Tutorials Dojo is not       #
-# liable for any data loss or security issues that may arise.     #
-#                                                                 #
-# Welcome to Kubernetes Playground by Tutorials Dojo!             #
-# Practice Kubernetes commands safely in this isolated sandbox.   #
-#                                                                 #
-# Developed by Jodi Gabano and Tutorials Dojo Team &lt;3          #
-###################################################################
-
-<span class="terminal-prompt">[node1] (local) root@10.0.1.2 ~</span>
-<span id="cursor">█</span>
+                    <div layout="row">
+                        <div flex="50">
+                            <md-input-container class="md-block" flex-gt-sm>
+                                <label>Terminal Font Size</label>
+                                <md-select ng-model="$ctrl.currentTerminalFontSize" ng-model-options="{getterSetter: true}">
+                                    <md-option ng-repeat="size in $ctrl.terminalFontSizes" value="{{size}}">
+                                        {{ size }}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
                         </div>
                     </div>
                 </div>
+            </md-dialog-content>
 
-                <!-- Cheat Sheet Sidebar -->
-                <div class="cheat-sheet" ng-show="showCheatSheet">
-                    <h3>📚 Kubernetes Commands Cheat Sheet</h3>
-                    
-                    <div class="command-group">
-                        <h4>🚀 Basic Commands</h4>
-                        <div class="command">
-                            <code>kubectl version</code>
-                            <div class="command-desc">Show Kubernetes version</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl cluster-info</code>
-                            <div class="command-desc">Display cluster information</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl get nodes</code>
-                            <div class="command-desc">List all nodes in cluster</div>
-                        </div>
-                    </div>
-
-                    <div class="command-group">
-                        <h4>🏗️ Pod Management</h4>
-                        <div class="command">
-                            <code>kubectl get pods</code>
-                            <div class="command-desc">List all pods</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl create pod nginx --image=nginx</code>
-                            <div class="command-desc">Create a pod with nginx image</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl describe pod [pod-name]</code>
-                            <div class="command-desc">Show detailed pod information</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl delete pod [pod-name]</code>
-                            <div class="command-desc">Delete a specific pod</div>
-                        </div>
-                    </div>
-
-                    <div class="command-group">
-                        <h4>📋 Deployments</h4>
-                        <div class="command">
-                            <code>kubectl get deployments</code>
-                            <div class="command-desc">List all deployments</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl create deployment nginx --image=nginx</code>
-                            <div class="command-desc">Create nginx deployment</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl scale deployment nginx --replicas=3</code>
-                            <div class="command-desc">Scale deployment to 3 replicas</div>
-                        </div>
-                    </div>
-
-                    <div class="command-group">
-                        <h4>🌐 Services</h4>
-                        <div class="command">
-                            <code>kubectl get services</code>
-                            <div class="command-desc">List all services</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl expose deployment nginx --port=80 --type=NodePort</code>
-                            <div class="command-desc">Expose deployment as service</div>
-                        </div>
-                    </div>
-
-                    <div class="command-group">
-                        <h4>🔍 Troubleshooting</h4>
-                        <div class="command">
-                            <code>kubectl logs [pod-name]</code>
-                            <div class="command-desc">View pod logs</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl exec -it [pod-name] -- /bin/bash</code>
-                            <div class="command-desc">Execute shell in pod</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl get events</code>
-                            <div class="command-desc">List cluster events</div>
-                        </div>
-                    </div>
-
-                    <div class="command-group">
-                        <h4>📦 Namespaces</h4>
-                        <div class="command">
-                            <code>kubectl get namespaces</code>
-                            <div class="command-desc">List all namespaces</div>
-                        </div>
-                        <div class="command">
-                            <code>kubectl create namespace [name]</code>
-                            <div class="command-desc">Create new namespace</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <md-dialog-actions layout="row">
+                <span flex></span>
+                <md-button ng-click="$ctrl.close()">
+                    Close
+                </md-button>
+            </md-dialog-actions>
+        </script>
 
         <!-- Scripts -->
-        <script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js" integrity="sha384-FtJyC+/3fgtPbqlacLHdGwBrmPjKoYBsiqNF5/BEprsnIXB4xtXLCJRx7Xx+TWKP" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="https://unpkg.com/angular@1.5.5/angular.min.js"></script>
         <script src="https://unpkg.com/angular-animate@1.5.5/angular-animate.min.js"></script>
         <script src="https://unpkg.com/angular-aria@1.5.5/angular-aria.min.js"></script>
         <script src="https://unpkg.com/angular-messages@1.5.5/angular-messages.min.js"></script>
         <script src="https://unpkg.com/angular-material@1.1.0/angular-material.min.js"></script>
+        <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/master/dist/clipboard.min.js"></script>
+        <script src="https://unpkg.com/ngclipboard@2.0.0/dist/ngclipboard.min.js"></script>
+        <script src="https://unpkg.com/ng-file-upload@12.2.13/dist/ng-file-upload-all.min.js" integrity="sha384-NbBOS/QuqJqwWOtYg/L3ZDhgl/6GFyvkRMypJQLgoisMPtJiHj5uQ+3bj8V8Muwm" crossorigin="anonymous"></script>
+        <script src="/assets/xterm/xterm.js"></script>
+        <script src="/assets/xterm/addons/fit/fit.js"></script>
+        <script src="/assets/xterm/addons/fullscreen/fullscreen.js"></script>
+        <script src="/assets/setup-xterm.js"></script>
+        <script src="/assets/attach.js"></script>
         <script src="https://unpkg.com/moment@2.16.0/min/moment.min.js"></script>
+        <script src="/assets/app.js"></script>
 
-        <!-- Custom Application Script -->
-        <script>
-            // Angular application
-            var app = angular.module('KubernetesPlay', ['ngMaterial']);
-
-            app.controller('PlayController', ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {
-                // Initialize application state
-                $scope.isReady = false;
-                $scope.showCheatSheet = true;
-                $scope.timeRemaining = '15:00';
-                $scope.memoryUsage = '0.1% (29.45MiB / 15.62GiB)';
-                $scope.cpuUsage = '0.0%';
-                $scope.containerId = 'k8s-node1-tutorial';
-                $scope.sshAccess = 'node1@tutorial.k8s.com';
-
-                // Timer logic (15 minutes = 900 seconds)
-                var totalSeconds = 900;
-                var currentSeconds = totalSeconds;
-
-                // Initialize the playground
-                $timeout(function() {
-                    $scope.isReady = true;
-                    startTimer();
-                    initializeTerminal();
-                }, 2000);
-
-                // Timer function
-                function startTimer() {
-                    $interval(function() {
-                        if (currentSeconds > 0) {
-                            currentSeconds--;
-                            var minutes = Math.floor(currentSeconds / 60);
-                            var seconds = currentSeconds % 60;
-                            $scope.timeRemaining = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-                        } else {
-                            $scope.timeRemaining = '00:00';
-                            $scope.closeSession();
-                        }
-                    }, 1000);
+        <script type="text/javascript" charset="utf-8">
+            window.onbeforeunload = function (e) {
+                e = e || window.event;
+                if (e) {
+                    e.returnValue = 'Make sure you saved your session URL';
                 }
+                return 'Make sure you saved your session URL';
+            };
 
-                // Terminal initialization
-                function initializeTerminal() {
-                    // Simulate terminal cursor blinking
-                    $interval(function() {
-                        var cursor = document.getElementById('cursor');
-                        if (cursor) {
-                            cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
-                        }
-                    }, 500);
+            // Add functions for cheat sheet and settings modals
+            angular.module('DockerPlay').run(['$rootScope', '$mdDialog', function($rootScope, $mdDialog) {
+                $rootScope.showCheatSheet = function() {
+                    $mdDialog.show({
+                        controller: function($scope, $mdDialog) {
+                            $scope.close = function() {
+                                $mdDialog.hide();
+                            };
+                        },
+                        template: `
+                            <md-dialog aria-label="Kubernetes Cheat Sheet">
+                                <md-toolbar>
+                                    <div class="md-toolbar-tools">
+                                        <h2>Kubernetes Cheat Sheet</h2>
+                                        <span flex></span>
+                                        <md-button class="md-icon-button" ng-click="close()">
+                                            <md-icon>close</md-icon>
+                                        </md-button>
+                                    </div>
+                                </md-toolbar>
+                                <md-dialog-content>
+                                    <div class="md-dialog-content" style="width: 700px; max-height: 500px;">
+                                        <div style="padding: 20px;">
+                                            <h3>Basic Commands</h3>
+                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                                                <div><strong>kubectl get nodes</strong> - Check cluster nodes</div>
+                                                <div><strong>kubectl get pods -A</strong> - List all pods</div>
+                                                <div><strong>kubectl create deployment nginx --image=nginx</strong> - Create deployment</div>
+                                                <div><strong>kubectl expose deployment nginx --port=80 --type=NodePort</strong> - Expose service</div>
+                                                <div><strong>kubectl get services</strong> - List services</div>
+                                            </div>
+                                            
+                                            <h3>Useful Commands</h3>
+                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                                                <div><strong>kubectl apply -f &lt;file.yaml&gt;</strong> - Apply configuration</div>
+                                                <div><strong>kubectl logs &lt;pod-name&gt;</strong> - View pod logs</div>
+                                                <div><strong>kubectl exec -it &lt;pod-name&gt; -- bash</strong> - Enter pod shell</div>
+                                                <div><strong>kubectl describe pod &lt;pod-name&gt;</strong> - Get pod details</div>
+                                                <div><strong>kubectl delete deployment &lt;name&gt;</strong> - Delete deployment</div>
+                                            </div>
 
-                    // Simulate periodic resource updates
-                    $interval(function() {
-                        // Random CPU usage between 0-5%
-                        var cpu = (Math.random() * 5).toFixed(1);
-                        $scope.cpuUsage = cpu + '%';
-
-                        // Random memory usage
-                        var memBase = 29.45 + (Math.random() * 10);
-                        var memPerc = (memBase / 156.2).toFixed(1);
-                        $scope.memoryUsage = memPerc + '% (' + memBase.toFixed(2) + 'MiB / 15.62GiB)';
-                    }, 3000);
-                }
-
-                // Toggle cheat sheet visibility
-                $scope.toggleCheatSheet = function() {
-                    $scope.showCheatSheet = !$scope.showCheatSheet;
+                                            <h3>Shortcuts</h3>
+                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                                                <div><strong>alias k=kubectl</strong> - Short alias for kubectl</div>
+                                                <div><strong>kubectl completion bash</strong> - Enable tab completion</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </md-dialog-content>
+                            </md-dialog>
+                        `,
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true
+                    });
                 };
 
-                // Close session function
-                $scope.closeSession = function() {
-                    if (confirm('Are you sure you want to close this session?')) {
-                        alert('Session closed. Thank you for using Kubernetes Playground!');
-                        // In real implementation, this would redirect or close the session
-                        window.location.reload();
-                    }
-                };
-
-                // Handle window beforeunload
-                window.onbeforeunload = function (e) {
-                    return 'Make sure you saved your progress before leaving!';
+                $rootScope.showSettings = function() {
+                    $mdDialog.show({
+                        templateUrl: 'settings-modal.html',
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                        controller: function($scope, $mdDialog) {
+                            var ctrl = this;
+                            ctrl.close = function() {
+                                $mdDialog.hide();
+                            };
+                            
+                            // Settings data
+                            ctrl.keyboardShortcutPresets = [
+                                {name: 'Default', presets: []},
+                                {name: 'Vim', presets: [{command: 'Ctrl+[', description: 'Escape'}]},
+                                {name: 'Emacs', presets: [{command: 'Ctrl+x Ctrl+c', description: 'Exit'}]}
+                            ];
+                            
+                            ctrl.instanceImages = ['franela/dind:latest', 'ubuntu:20.04', 'alpine:latest'];
+                            ctrl.terminalFontSizes = [12, 14, 16, 18, 20];
+                            
+                            ctrl.currentShortcutConfig = function(value) {
+                                if (arguments.length) {
+                                    ctrl.selectedShortcutPreset = value;
+                                    return value;
+                                }
+                                return ctrl.selectedShortcutPreset || ctrl.keyboardShortcutPresets[0];
+                            };
+                            
+                            ctrl.currentDesiredInstanceImage = function(value) {
+                                if (arguments.length) {
+                                    ctrl.selectedInstanceImage = value;
+                                    return value;
+                                }
+                                return ctrl.selectedInstanceImage || ctrl.instanceImages[0];
+                            };
+                            
+                            ctrl.currentTerminalFontSize = function(value) {
+                                if (arguments.length) {
+                                    ctrl.selectedFontSize = value;
+                                    return value;
+                                }
+                                return ctrl.selectedFontSize || ctrl.terminalFontSizes[2];
+                            };
+                            
+                            $scope.$ctrl = ctrl;
+                        }
+                    });
                 };
             }]);
-
-            // Configure Angular Material theme
-            app.config(function($mdThemingProvider) {
-                $mdThemingProvider.theme('default')
-                    .primaryPalette('indigo')
-                    .accentPalette('blue');
-            });
         </script>
     </body>
 </html>
