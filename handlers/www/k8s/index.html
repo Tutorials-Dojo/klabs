@@ -67,19 +67,20 @@
             }
 
             .close-session-btn {
-                background: #f44336 !important;
+                background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%) !important;
                 color: white !important;
                 border: none !important;
                 padding: 10px 20px !important;
                 border-radius: 6px !important;
                 font-weight: 500 !important;
                 transition: all 0.3s ease !important;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
 
             .close-session-btn:hover {
-                background: #d32f2f !important;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(244, 67, 54, 0.3);
             }
 
             /* Main content layout */
@@ -113,19 +114,20 @@
             }
 
             .add-instance-btn {
-                background: #4caf50 !important;
+                background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%) !important;
                 color: white !important;
                 width: 100%;
                 padding: 12px !important;
                 border-radius: 6px !important;
                 font-weight: 500 !important;
                 transition: all 0.3s ease !important;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
 
             .add-instance-btn:hover {
-                background: #43a047 !important;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                background: linear-gradient(135deg, #43a047 0%, #1b5e20 100%) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(76, 175, 80, 0.3);
             }
 
             .add-instance-btn:disabled {
@@ -272,29 +274,31 @@
             }
 
             .detail-item input {
-                width: calc(100% - 40px);
-                padding: 8px 12px;
+                width: 100%;
+                padding: 8px 40px 8px 12px;
                 border: 1px solid #e0e0e0;
                 border-radius: 4px;
                 font-size: 14px;
                 background: #f8f9fa;
+                box-sizing: border-box;
             }
 
             .copy-btn {
                 position: absolute;
-                right: 0;
+                right: 4px;
                 top: 26px;
-                background: #2196f3;
-                color: white;
+                background: transparent;
+                color: #666;
                 border: none;
-                border-radius: 4px;
-                padding: 6px 10px;
+                padding: 6px;
                 cursor: pointer;
-                font-size: 12px;
+                font-size: 16px;
+                border-radius: 4px;
             }
 
             .copy-btn:hover {
-                background: #1976d2;
+                background: #f0f0f0;
+                color: #2196f3;
             }
 
             .port-chips {
@@ -305,20 +309,23 @@
             }
 
             .port-chip {
-                background: #1976d2;
+                background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
                 color: white;
                 padding: 4px 12px;
                 border-radius: 16px;
                 font-size: 12px;
                 font-weight: 500;
                 text-decoration: none;
-                transition: background 0.2s ease;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
 
             .port-chip:hover {
-                background: #1565c0;
+                background: linear-gradient(135deg, #1565c0 0%, #082e61 100%);
                 color: white;
                 text-decoration: none;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             }
 
             .instance-actions {
@@ -329,33 +336,41 @@
             }
 
             .delete-instance-btn {
-                background: #f44336 !important;
+                background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%) !important;
                 color: white !important;
                 padding: 10px 20px !important;
                 border-radius: 6px !important;
                 font-weight: 500 !important;
                 transition: all 0.3s ease !important;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
 
             .delete-instance-btn:hover {
-                background: #d32f2f !important;
+                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(244, 67, 54, 0.3);
             }
 
             .delete-instance-btn:disabled {
                 background: #cccccc !important;
+                transform: none !important;
+                box-shadow: none !important;
             }
 
             .cheat-sheet-btn {
-                background: #2196f3 !important;
+                background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%) !important;
                 color: white !important;
                 padding: 10px 20px !important;
                 border-radius: 6px !important;
                 font-weight: 500 !important;
                 transition: all 0.3s ease !important;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             }
 
             .cheat-sheet-btn:hover {
-                background: #1976d2 !important;
+                background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(33, 150, 243, 0.3);
             }
 
             /* Terminal container */
@@ -418,59 +433,96 @@
             }
 
             /* Cheat Sheet Styles */
-            .cheat-category {
-                margin-bottom: 15px;
-                border: 1px solid #e0e0e0;
-                border-radius: 4px;
-                overflow: hidden;
-            }
-
-            .cheat-category-header {
-                background: #f5f5f5;
-                padding: 12px 15px;
-                cursor: pointer;
+            .cheat-sheet-container {
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-weight: 500;
+                height: 70vh;
+                max-height: 600px;
             }
 
-            .cheat-category-content {
-                padding: 0;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.3s ease;
+            .cheat-sidebar {
+                width: 250px;
+                background: #f5f5f5;
+                border-right: 1px solid #e0e0e0;
+                overflow-y: auto;
             }
 
-            .cheat-category-content.expanded {
-                max-height: 500px;
-                padding: 15px;
+            .cheat-sidebar-item {
+                padding: 15px 20px;
+                border-bottom: 1px solid #e0e0e0;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .cheat-sidebar-item:hover {
+                background: #e3f2fd;
+            }
+
+            .cheat-sidebar-item.active {
+                background: #bbdefb;
+                border-right: 4px solid #2196f3;
+            }
+
+            .cheat-content {
+                flex: 1;
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            .cheat-topic {
+                margin-bottom: 25px;
+            }
+
+            .cheat-topic-title {
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: #1a237e;
             }
 
             .cheat-command {
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid #eee;
-            }
-
-            .cheat-command:last-child {
-                margin-bottom: 0;
-                padding-bottom: 0;
-                border-bottom: none;
+                margin-bottom: 15px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border-left: 4px solid #2196f3;
             }
 
             .command-code {
-                font-family: monospace;
-                background: #f8f9fa;
-                padding: 8px;
+                font-family: 'Roboto Mono', monospace;
+                background: #263238;
+                color: #e0e0e0;
+                padding: 12px;
                 border-radius: 4px;
                 display: block;
-                margin-bottom: 5px;
+                margin-bottom: 10px;
+                position: relative;
+            }
+
+            .command-actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            .command-btn {
+                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+
+            .command-btn:hover {
+                background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+                transform: translateY(-1px);
             }
 
             .command-desc {
                 color: #666;
                 font-size: 14px;
+                margin-bottom: 10px;
             }
 
             /* Session Timeout Modal */
@@ -502,13 +554,65 @@
             }
 
             .session-timeout-content button {
-                background: #2196f3;
+                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
                 color: white;
                 border: none;
                 padding: 10px 20px;
                 border-radius: 4px;
                 cursor: pointer;
                 margin-top: 20px;
+                transition: all 0.2s ease;
+            }
+
+            .session-timeout-content button:hover {
+                background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+                transform: translateY(-1px);
+            }
+
+            /* Resource usage indicators */
+            .resource-indicator {
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+            }
+
+            .resource-label {
+                width: 80px;
+                font-weight: 600;
+                color: #666;
+            }
+
+            .resource-value {
+                flex: 1;
+                background: #f0f0f0;
+                height: 20px;
+                border-radius: 10px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .resource-fill {
+                height: 100%;
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            }
+
+            .memory-fill {
+                background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            }
+
+            .cpu-fill {
+                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            }
+
+            .resource-text {
+                position: absolute;
+                right: 8px;
+                top: 0;
+                line-height: 20px;
+                font-size: 12px;
+                color: #333;
+                font-weight: 600;
             }
 
             /* Responsive design */
@@ -533,6 +637,18 @@
                 .timer-display {
                     font-size: 14px;
                     padding: 6px 12px;
+                }
+
+                .cheat-sheet-container {
+                    flex-direction: column;
+                    height: 80vh;
+                }
+
+                .cheat-sidebar {
+                    width: 100%;
+                    height: 150px;
+                    border-right: none;
+                    border-bottom: 1px solid #e0e0e0;
                 }
             }
 
@@ -586,18 +702,11 @@
                 </div>
             </section>
 
-            <!-- Disconnected Screen -->
-            <section ng-if="!connected" class="disconnected">
-                <h1>No connection to server. Reconnecting...</h1>
-                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
-            </section>
-
             <!-- Main Application -->
             <section ng-if="isAlive">
                 <!-- Header -->
                 <div class="main-header">
                     <div class="header-left">
-                        <div class="k8s-logo"></div>
                         <h1 class="header-title">Kubernetes Playground</h1>
                     </div>
                     <div class="header-right">
@@ -673,16 +782,36 @@
                                         </div>
                                         <div class="detail-item">
                                             <label>Memory</label>
-                                            <input ng-model="instance.memory || 'Not available'" type="text" readonly="readonly">
+                                            <div class="resource-indicator" ng-if="instance.memory">
+                                                <div class="resource-label">Memory</div>
+                                                <div class="resource-value">
+                                                    <div class="resource-fill memory-fill" ng-style="{'width': instance.memory.usagePercent + '%'}"></div>
+                                                    <div class="resource-text">{{instance.memory.usage}} / {{instance.memory.limit}}</div>
+                                                </div>
+                                            </div>
+                                            <div ng-if="!instance.memory">
+                                                <input value="Not available" type="text" readonly="readonly">
+                                            </div>
                                         </div>
                                         <div class="detail-item">
                                             <label>CPU</label>
-                                            <input ng-model="instance.cpu || 'Not available'" type="text" readonly="readonly">
+                                            <div class="resource-indicator" ng-if="instance.cpu">
+                                                <div class="resource-label">CPU</div>
+                                                <div class="resource-value">
+                                                    <div class="resource-fill cpu-fill" ng-style="{'width': instance.cpu.usagePercent + '%'}"></div>
+                                                    <div class="resource-text">{{instance.cpu.usagePercent}}%</div>
+                                                </div>
+                                            </div>
+                                            <div ng-if="!instance.cpu">
+                                                <input value="Not available" type="text" readonly="readonly">
+                                            </div>
                                         </div>
                                         <div class="detail-item">
                                             <label>Direct URL</label>
                                             <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly">
-                                            <button class="copy-btn" ng-click="copyToClipboard(instance.proxy_host + '.direct.' + host)">Copy</button>
+                                            <button class="copy-btn" ng-click="copyToClipboard(instance.proxy_host + '.direct.' + host)">
+                                                <md-icon>content_copy</md-icon>
+                                            </button>
                                         </div>
                                     </div>
                                     <div ng-if="instance.ports.length" class="detail-item">
@@ -709,19 +838,6 @@
                                         {{deleteInstanceBtnText || 'Delete Instance'}}
                                     </button>
                                 </div>
-                            </div>
-
-                            <!-- Upload Progress -->
-                            <div ng-show="uploadMessage" class="upload-status">
-                                <md-progress-linear md-mode="determinate" value="{{uploadProgress}}"></md-progress-linear>
-                                <div style="margin-top: 8px;">
-                                    <span>{{uploadMessage}}</span>
-                                </div>
-                            </div>
-
-                            <!-- Reconnection Status -->
-                            <div ng-show="instance.status=='reconnect'" class="upload-status">
-                                Connection has been lost. Sometimes this happens when a windows instance is joining a swarm. Trying to reconnect terminal...
                             </div>
 
                             <!-- Terminal -->
@@ -872,41 +988,113 @@
                 $rootScope.showCheatSheet = function() {
                     $mdDialog.show({
                         controller: function($scope, $mdDialog) {
-                            $scope.categories = [
+                            $scope.topics = [
                                 {
-                                    name: "Basic Commands",
-                                    expanded: true,
+                                    name: "Getting Started",
                                     commands: [
-                                        {command: "kubectl get nodes", description: "Check cluster nodes"},
-                                        {command: "kubectl get pods -A", description: "List all pods"},
-                                        {command: "kubectl create deployment nginx --image=nginx", description: "Create deployment"},
-                                        {command: "kubectl expose deployment nginx --port=80 --type=NodePort", description: "Expose service"},
-                                        {command: "kubectl get services", description: "List services"}
+                                        {
+                                            code: "docker version",
+                                            description: "Check client and server version",
+                                            output: "Client: Docker Engine - Community\nVersion: 20.10.8\nServer: Docker Engine - Community\nEngine:\n  Version: 20.10.8"
+                                        },
+                                        {
+                                            code: "docker info",
+                                            description: "Display system-wide information"
+                                        },
+                                        {
+                                            code: "docker run hello-world",
+                                            description: "Run a test container"
+                                        }
                                     ]
                                 },
                                 {
-                                    name: "Useful Commands",
-                                    expanded: false,
+                                    name: "Working with Images",
                                     commands: [
-                                        {command: "kubectl apply -f <file.yaml>", description: "Apply configuration"},
-                                        {command: "kubectl logs <pod-name>", description: "View pod logs"},
-                                        {command: "kubectl exec -it <pod-name> -- bash", description: "Enter pod shell"},
-                                        {command: "kubectl describe pod <pod-name>", description: "Get pod details"},
-                                        {command: "kubectl delete deployment <name>", description: "Delete deployment"}
+                                        {
+                                            code: "docker pull nginx",
+                                            description: "Download an image"
+                                        },
+                                        {
+                                            code: "docker images",
+                                            description: "List images"
+                                        },
+                                        {
+                                            code: "docker rmi <image_id>",
+                                            description: "Remove an image"
+                                        }
                                     ]
                                 },
                                 {
-                                    name: "Shortcuts",
-                                    expanded: false,
+                                    name: "Container Operations",
                                     commands: [
-                                        {command: "alias k=kubectl", description: "Short alias for kubectl"},
-                                        {command: "kubectl completion bash", description: "Enable tab completion"}
+                                        {
+                                            code: "docker run -d --name mynginx nginx",
+                                            description: "Run a container in detached mode"
+                                        },
+                                        {
+                                            code: "docker ps",
+                                            description: "List running containers"
+                                        },
+                                        {
+                                            code: "docker stop <container_id>",
+                                            description: "Stop a container"
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Files & Volumes",
+                                    commands: [
+                                        {
+                                            code: "docker cp file.txt container:/path/",
+                                            description: "Copy files between host and container"
+                                        },
+                                        {
+                                            code: "docker run -v /host/path:/container/path",
+                                            description: "Mount a host directory as a volume"
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: "Networking & Ports",
+                                    commands: [
+                                        {
+                                            code: "docker run -p 8080:80 nginx",
+                                            description: "Map container port to host"
+                                        },
+                                        {
+                                            code: "docker network ls",
+                                            description: "List networks"
+                                        }
                                     ]
                                 }
                             ];
                             
-                            $scope.toggleCategory = function(category) {
-                                category.expanded = !category.expanded;
+                            $scope.activeTopic = $scope.topics[0];
+                            
+                            $scope.setActiveTopic = function(topic) {
+                                $scope.activeTopic = topic;
+                            };
+                            
+                            $scope.runCommand = function(command) {
+                                // This would need to be implemented to send commands to the terminal
+                                console.log("Running command:", command);
+                            };
+                            
+                            $scope.copyCommand = function(command) {
+                                var textArea = document.createElement("textarea");
+                                textArea.value = command;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand("copy");
+                                document.body.removeChild(textArea);
+                                
+                                // Show notification
+                                $mdDialog.show(
+                                    $mdDialog.alert()
+                                        .title('Copied!')
+                                        .textContent('Command copied to clipboard')
+                                        .ok('OK')
+                                );
                             };
                             
                             $scope.close = function() {
@@ -914,10 +1102,10 @@
                             };
                         },
                         template: `
-                            <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 800px;">
+                            <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 900px; height: 80vh;">
                                 <md-toolbar>
                                     <div class="md-toolbar-tools">
-                                        <h2>Kubernetes Cheat Sheet</h2>
+                                        <h2>Docker Cheat Sheet</h2>
                                         <span flex></span>
                                         <md-button class="md-icon-button" ng-click="close()">
                                             <md-icon>close</md-icon>
@@ -925,16 +1113,26 @@
                                     </div>
                                 </md-toolbar>
                                 <md-dialog-content>
-                                    <div class="md-dialog-content" style="max-height: 70vh;">
-                                        <div ng-repeat="category in categories" class="cheat-category">
-                                            <div class="cheat-category-header" ng-click="toggleCategory(category)">
-                                                <span>{{category.name}}</span>
-                                                <md-icon>{{category.expanded ? 'expand_less' : 'expand_more'}}</md-icon>
+                                    <div class="cheat-sheet-container">
+                                        <div class="cheat-sidebar">
+                                            <div ng-repeat="topic in topics" 
+                                                 class="cheat-sidebar-item" 
+                                                 ng-class="{'active': activeTopic === topic}"
+                                                 ng-click="setActiveTopic(topic)">
+                                                {{topic.name}}
                                             </div>
-                                            <div class="cheat-category-content" ng-class="{'expanded': category.expanded}">
-                                                <div ng-repeat="cmd in category.commands" class="cheat-command">
-                                                    <code class="command-code">{{cmd.command}}</code>
-                                                    <div class="command-desc">{{cmd.description}}</div>
+                                        </div>
+                                        <div class="cheat-content">
+                                            <div ng-repeat="command in activeTopic.commands" class="cheat-command">
+                                                <div class="command-desc">{{command.description}}</div>
+                                                <code class="command-code">{{command.code}}</code>
+                                                <div class="command-actions">
+                                                    <button class="command-btn" ng-click="runCommand(command.code)">Run</button>
+                                                    <button class="command-btn" ng-click="copyCommand(command.code)">Copy</button>
+                                                </div>
+                                                <div ng-if="command.output" style="margin-top: 10px;">
+                                                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Example output:</div>
+                                                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-size: 12px; margin: 0;">{{command.output}}</pre>
                                                 </div>
                                             </div>
                                         </div>
@@ -947,6 +1145,37 @@
                         fullscreen: false
                     });
                 };
+                
+                // Simulate resource usage data (replace with actual data from WebSocket)
+                $rootScope.updateResourceUsage = function() {
+                    if ($rootScope.instances && $rootScope.instances.length > 0) {
+                        $rootScope.instances.forEach(function(instance) {
+                            // Simulate memory usage
+                            instance.memory = {
+                                usage: (Math.floor(Math.random() * 4) + 1) + 'GB',
+                                limit: '4GB',
+                                usagePercent: Math.floor(Math.random() * 60) + 20
+                            };
+                            
+                            // Simulate CPU usage
+                            instance.cpu = {
+                                usagePercent: Math.floor(Math.random() * 70) + 10
+                            };
+                        });
+                        
+                        if (!$rootScope.$$phase) {
+                            $rootScope.$apply();
+                        }
+                    }
+                };
+                
+                // Periodically update resource usage (replace with real WebSocket updates)
+                setInterval(function() {
+                    $rootScope.updateResourceUsage();
+                }, 5000);
+                
+                // Initial update
+                $rootScope.updateResourceUsage();
             }]);
         </script>
     </body>
