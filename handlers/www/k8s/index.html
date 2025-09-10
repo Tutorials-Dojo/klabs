@@ -109,9 +109,7 @@
                 font-weight: 600;
                 margin: 0 0 16px 0;
                 color: #1a237e;
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                text-align: left;
             }
 
             .add-instance-btn {
@@ -260,6 +258,10 @@
                 margin-bottom: 16px;
             }
 
+            .detail-item {
+                position: relative;
+            }
+
             .detail-item label {
                 display: block;
                 font-size: 12px;
@@ -270,12 +272,29 @@
             }
 
             .detail-item input {
-                width: 100%;
+                width: calc(100% - 40px);
                 padding: 8px 12px;
                 border: 1px solid #e0e0e0;
                 border-radius: 4px;
                 font-size: 14px;
                 background: #f8f9fa;
+            }
+
+            .copy-btn {
+                position: absolute;
+                right: 0;
+                top: 26px;
+                background: #2196f3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 6px 10px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+
+            .copy-btn:hover {
+                background: #1976d2;
             }
 
             .port-chips {
@@ -339,19 +358,12 @@
                 background: #1976d2 !important;
             }
 
-            .settings-btn {
-                background: transparent !important;
-                color: white !important;
-                min-width: 40px !important;
-                padding: 8px !important;
-                border-radius: 50% !important;
-            }
-
             /* Terminal container */
             .terminal-container {
                 flex: 1;
                 padding: 20px;
                 background: #1e1e1e;
+                overflow: hidden;
             }
 
             .terminal-instance {
@@ -405,6 +417,100 @@
                 margin-right: 20px;
             }
 
+            /* Cheat Sheet Styles */
+            .cheat-category {
+                margin-bottom: 15px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .cheat-category-header {
+                background: #f5f5f5;
+                padding: 12px 15px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-weight: 500;
+            }
+
+            .cheat-category-content {
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+
+            .cheat-category-content.expanded {
+                max-height: 500px;
+                padding: 15px;
+            }
+
+            .cheat-command {
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .cheat-command:last-child {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+
+            .command-code {
+                font-family: monospace;
+                background: #f8f9fa;
+                padding: 8px;
+                border-radius: 4px;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .command-desc {
+                color: #666;
+                font-size: 14px;
+            }
+
+            /* Session Timeout Modal */
+            .session-timeout-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            }
+
+            .session-timeout-content {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+            }
+
+            .session-timeout-content h2 {
+                color: #f44336;
+                margin-top: 0;
+            }
+
+            .session-timeout-content button {
+                background: #2196f3;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 20px;
+            }
+
             /* Responsive design */
             @media (max-width: 768px) {
                 .sidebar {
@@ -439,6 +545,16 @@
                 background: rgba(33, 150, 243, 0.1);
                 border: 2px dashed #2196f3;
             }
+
+            /* Terminal scrollbar fix */
+            .xterm-viewport {
+                overflow-y: auto !important;
+                scrollbar-width: none; /* Firefox */
+            }
+
+            .xterm-viewport::-webkit-scrollbar {
+                display: none; /* Chrome, Safari */
+            }
         </style>
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-89019737-3"></script>
@@ -461,6 +577,15 @@
               </div>
             </section>
 
+            <!-- Session Timeout Modal -->
+            <section ng-if="showTimeoutModal" class="session-timeout-modal">
+                <div class="session-timeout-content">
+                    <h2>Session Timeout</h2>
+                    <p>Your session has ended after 15 minutes. All instances have been terminated.</p>
+                    <button ng-click="redirectToLanding()">Got It</button>
+                </div>
+            </section>
+
             <!-- Disconnected Screen -->
             <section ng-if="!connected" class="disconnected">
                 <h1>No connection to server. Reconnecting...</h1>
@@ -478,9 +603,6 @@
                     <div class="header-right">
                         <div class="timer-display">{{ttl}}</div>
                         <button class="close-session-btn" ng-click="closeSession()">Close Session</button>
-                        <button class="settings-btn" ng-click="showSettings()">
-                            <md-icon>settings</md-icon>
-                        </button>
                         <button class="cheat-sheet-btn" ng-click="showCheatSheet()">Cheat Sheet</button>
                     </div>
                 </div>
@@ -491,7 +613,6 @@
                     <div class="sidebar">
                         <div class="sidebar-header">
                             <div class="sidebar-title">
-                                <md-icon>computer</md-icon>
                                 Instances
                             </div>
                             <button class="add-instance-btn" ng-click="newInstance()" ng-disabled="isInstanceBeingCreated">
@@ -527,7 +648,7 @@
                             <h2>Welcome to Kubernetes Playground</h2>
                             <p>Add instances to your playground to get started.</p>
                             <div class="session-info">
-                                <strong>Sessions and all their instances are deleted after {{ttl}} hours.</strong>
+                                <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
                             </div>
                         </div>
 
@@ -552,15 +673,16 @@
                                         </div>
                                         <div class="detail-item">
                                             <label>Memory</label>
-                                            <input ng-model="instance.mem" type="text" readonly="readonly">
+                                            <input ng-model="instance.memory || 'Not available'" type="text" readonly="readonly">
                                         </div>
                                         <div class="detail-item">
                                             <label>CPU</label>
-                                            <input ng-model="instance.cpu" type="text" readonly="readonly">
+                                            <input ng-model="instance.cpu || 'Not available'" type="text" readonly="readonly">
                                         </div>
                                         <div class="detail-item">
                                             <label>Direct URL</label>
                                             <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly">
+                                            <button class="copy-btn" ng-click="copyToClipboard(instance.proxy_host + '.direct.' + host)">Copy</button>
                                         </div>
                                     </div>
                                     <div ng-if="instance.ports.length" class="detail-item">
@@ -624,7 +746,6 @@
                   <md-button class="md-warn md-raised" ng-click="closeSession()">Close session</md-button>
                   <div class="md-toolbar-tools">
                     <h1 class="md-toolbar-tools">Instances</h1>
-                    <settings-icon></settings-icon><br/>
                   </div>
                   <div class="md-toolbar-tools" ng-if="playground.allow_windows_instances">
                       <md-switch ng-model="type.windows">
@@ -648,79 +769,6 @@
                 </md-content>
             </md-sidenav>
         </div>
-
-        <!-- Settings Modal Template -->
-        <script type="text/ng-template" id="settings-modal.html">
-            <md-toolbar md-theme="kube">
-                <div class="md-toolbar-tools">
-                    <h2>Settings</h2>
-                    <span flex></span>
-                    <md-button class="md-icon-button" ng-click="$ctrl.close()">
-                        <md-icon class="material-icon" aria-label="Close dialog">close</md-icon>
-                    </md-button>
-                </div>
-            </md-toolbar>
-
-            <md-dialog-content>
-                <div class="md-dialog-content" style="width:600px;">
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Keyboard Shortcut Preset</label>
-                                <md-select ng-model="$ctrl.currentShortcutConfig" ng-model-options="{getterSetter: true}" placeholder="Keyboard shortcut prefix">
-                                    <md-option ng-repeat="preset in $ctrl.keyboardShortcutPresets" value="{{preset}}">
-                                        {{preset.name}}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                        <div flex="10"></div>
-                        <div flex="40">
-                            <div ng-if="$ctrl.selectedShortcutPreset">
-                                Preset details:
-                                <ul>
-                                    <li ng-if="$ctrl.selectedShortcutPreset.presets.length == 0">No presets defined</li>
-                                    <li ng-repeat="preset in $ctrl.selectedShortcutPreset.presets">
-                                        <code>{{preset.command}}</code> - {{preset.description}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Instance Image</label>
-                                <md-select ng-model="$ctrl.currentDesiredInstanceImage" ng-model-options="{getterSetter: true}" placeholder="New Instance Image">
-                                    <md-option ng-repeat="image in $ctrl.instanceImages" value="{{image}}">
-                                        {{ image }}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                    </div>
-                    <div layout="row">
-                        <div flex="50">
-                            <md-input-container class="md-block" flex-gt-sm>
-                                <label>Terminal Font Size</label>
-                                <md-select ng-model="$ctrl.currentTerminalFontSize" ng-model-options="{getterSetter: true}">
-                                    <md-option ng-repeat="size in $ctrl.terminalFontSizes" value="{{size}}">
-                                        {{ size }}
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
-                        </div>
-                    </div>
-                </div>
-            </md-dialog-content>
-
-            <md-dialog-actions layout="row">
-                <span flex></span>
-                <md-button ng-click="$ctrl.close()">
-                    Close
-                </md-button>
-            </md-dialog-actions>
-        </script>
 
         <!-- Scripts -->
         <script src="https://unpkg.com/reconnectingwebsocket@1.0.0/reconnecting-websocket.min.js" integrity="sha384-FtJyC+/3fgtPbqlacLHdGwBrmPjKoYBsiqNF5/BEprsnIXB4xtXLCJRx7Xx+TWKP" crossorigin="anonymous"></script>
@@ -750,17 +798,123 @@
                 return 'Make sure you saved your session URL';
             };
 
-            // Add functions for cheat sheet and settings modals
-            angular.module('DockerPlay').run(['$rootScope', '$mdDialog', function($rootScope, $mdDialog) {
+            // Add functions for cheat sheet and other functionality
+            angular.module('DockerPlay').run(['$rootScope', '$mdDialog', '$timeout', '$window', function($rootScope, $mdDialog, $timeout, $window) {
+                // Set session timeout to 15 minutes (900000 milliseconds)
+                $rootScope.sessionDuration = 900000;
+                
+                // Initialize timer
+                $rootScope.initTimer = function() {
+                    $rootScope.ttl = "15:00";
+                    $rootScope.sessionStartTime = new Date().getTime();
+                    
+                    // Update timer every second
+                    $rootScope.timerInterval = setInterval(function() {
+                        var elapsed = new Date().getTime() - $rootScope.sessionStartTime;
+                        var remaining = Math.max(0, $rootScope.sessionDuration - elapsed);
+                        
+                        var minutes = Math.floor(remaining / 60000);
+                        var seconds = Math.floor((remaining % 60000) / 1000);
+                        
+                        $rootScope.ttl = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                        
+                        // Force Angular to update the view
+                        if (!$rootScope.$$phase) {
+                            $rootScope.$apply();
+                        }
+                        
+                        // Check if session has ended
+                        if (remaining <= 0) {
+                            $rootScope.closeSession(true);
+                        }
+                    }, 1000);
+                };
+                
+                // Close session function
+                $rootScope.closeSession = function(timeout) {
+                    clearInterval($rootScope.timerInterval);
+                    
+                    if (timeout) {
+                        $rootScope.showTimeoutModal = true;
+                    } else {
+                        $rootScope.isAlive = false;
+                        // Additional cleanup logic here
+                    }
+                };
+                
+                // Redirect to landing page
+                $rootScope.redirectToLanding = function() {
+                    $window.location.href = "/"; // Change to your landing page URL
+                };
+                
+                // Copy to clipboard function
+                $rootScope.copyToClipboard = function(text) {
+                    var textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    
+                    // Show notification
+                    $mdDialog.show(
+                        $mdDialog.alert()
+                            .title('Copied!')
+                            .textContent('URL copied to clipboard')
+                            .ok('OK')
+                    );
+                };
+                
+                // Initialize the timer when the app starts
+                $rootScope.initTimer();
+                
+                // Cheat sheet with categories
                 $rootScope.showCheatSheet = function() {
                     $mdDialog.show({
                         controller: function($scope, $mdDialog) {
+                            $scope.categories = [
+                                {
+                                    name: "Basic Commands",
+                                    expanded: true,
+                                    commands: [
+                                        {command: "kubectl get nodes", description: "Check cluster nodes"},
+                                        {command: "kubectl get pods -A", description: "List all pods"},
+                                        {command: "kubectl create deployment nginx --image=nginx", description: "Create deployment"},
+                                        {command: "kubectl expose deployment nginx --port=80 --type=NodePort", description: "Expose service"},
+                                        {command: "kubectl get services", description: "List services"}
+                                    ]
+                                },
+                                {
+                                    name: "Useful Commands",
+                                    expanded: false,
+                                    commands: [
+                                        {command: "kubectl apply -f <file.yaml>", description: "Apply configuration"},
+                                        {command: "kubectl logs <pod-name>", description: "View pod logs"},
+                                        {command: "kubectl exec -it <pod-name> -- bash", description: "Enter pod shell"},
+                                        {command: "kubectl describe pod <pod-name>", description: "Get pod details"},
+                                        {command: "kubectl delete deployment <name>", description: "Delete deployment"}
+                                    ]
+                                },
+                                {
+                                    name: "Shortcuts",
+                                    expanded: false,
+                                    commands: [
+                                        {command: "alias k=kubectl", description: "Short alias for kubectl"},
+                                        {command: "kubectl completion bash", description: "Enable tab completion"}
+                                    ]
+                                }
+                            ];
+                            
+                            $scope.toggleCategory = function(category) {
+                                category.expanded = !category.expanded;
+                            };
+                            
                             $scope.close = function() {
                                 $mdDialog.hide();
                             };
                         },
                         template: `
-                            <md-dialog aria-label="Kubernetes Cheat Sheet">
+                            <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 800px;">
                                 <md-toolbar>
                                     <div class="md-toolbar-tools">
                                         <h2>Kubernetes Cheat Sheet</h2>
@@ -771,30 +925,17 @@
                                     </div>
                                 </md-toolbar>
                                 <md-dialog-content>
-                                    <div class="md-dialog-content" style="width: 700px; max-height: 500px;">
-                                        <div style="padding: 20px;">
-                                            <h3>Basic Commands</h3>
-                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
-                                                <div><strong>kubectl get nodes</strong> - Check cluster nodes</div>
-                                                <div><strong>kubectl get pods -A</strong> - List all pods</div>
-                                                <div><strong>kubectl create deployment nginx --image=nginx</strong> - Create deployment</div>
-                                                <div><strong>kubectl expose deployment nginx --port=80 --type=NodePort</strong> - Expose service</div>
-                                                <div><strong>kubectl get services</strong> - List services</div>
+                                    <div class="md-dialog-content" style="max-height: 70vh;">
+                                        <div ng-repeat="category in categories" class="cheat-category">
+                                            <div class="cheat-category-header" ng-click="toggleCategory(category)">
+                                                <span>{{category.name}}</span>
+                                                <md-icon>{{category.expanded ? 'expand_less' : 'expand_more'}}</md-icon>
                                             </div>
-                                            
-                                            <h3>Useful Commands</h3>
-                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
-                                                <div><strong>kubectl apply -f &lt;file.yaml&gt;</strong> - Apply configuration</div>
-                                                <div><strong>kubectl logs &lt;pod-name&gt;</strong> - View pod logs</div>
-                                                <div><strong>kubectl exec -it &lt;pod-name&gt; -- bash</strong> - Enter pod shell</div>
-                                                <div><strong>kubectl describe pod &lt;pod-name&gt;</strong> - Get pod details</div>
-                                                <div><strong>kubectl delete deployment &lt;name&gt;</strong> - Delete deployment</div>
-                                            </div>
-
-                                            <h3>Shortcuts</h3>
-                                            <div style="font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 10px 0;">
-                                                <div><strong>alias k=kubectl</strong> - Short alias for kubectl</div>
-                                                <div><strong>kubectl completion bash</strong> - Enable tab completion</div>
+                                            <div class="cheat-category-content" ng-class="{'expanded': category.expanded}">
+                                                <div ng-repeat="cmd in category.commands" class="cheat-command">
+                                                    <code class="command-code">{{cmd.command}}</code>
+                                                    <div class="command-desc">{{cmd.description}}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -802,57 +943,8 @@
                             </md-dialog>
                         `,
                         parent: angular.element(document.body),
-                        clickOutsideToClose: true
-                    });
-                };
-
-                $rootScope.showSettings = function() {
-                    $mdDialog.show({
-                        templateUrl: 'settings-modal.html',
-                        parent: angular.element(document.body),
                         clickOutsideToClose: true,
-                        controller: function($scope, $mdDialog) {
-                            var ctrl = this;
-                            ctrl.close = function() {
-                                $mdDialog.hide();
-                            };
-                            
-                            // Settings data
-                            ctrl.keyboardShortcutPresets = [
-                                {name: 'Default', presets: []},
-                                {name: 'Vim', presets: [{command: 'Ctrl+[', description: 'Escape'}]},
-                                {name: 'Emacs', presets: [{command: 'Ctrl+x Ctrl+c', description: 'Exit'}]}
-                            ];
-                            
-                            ctrl.instanceImages = ['franela/dind:latest', 'ubuntu:20.04', 'alpine:latest'];
-                            ctrl.terminalFontSizes = [12, 14, 16, 18, 20];
-                            
-                            ctrl.currentShortcutConfig = function(value) {
-                                if (arguments.length) {
-                                    ctrl.selectedShortcutPreset = value;
-                                    return value;
-                                }
-                                return ctrl.selectedShortcutPreset || ctrl.keyboardShortcutPresets[0];
-                            };
-                            
-                            ctrl.currentDesiredInstanceImage = function(value) {
-                                if (arguments.length) {
-                                    ctrl.selectedInstanceImage = value;
-                                    return value;
-                                }
-                                return ctrl.selectedInstanceImage || ctrl.instanceImages[0];
-                            };
-                            
-                            ctrl.currentTerminalFontSize = function(value) {
-                                if (arguments.length) {
-                                    ctrl.selectedFontSize = value;
-                                    return value;
-                                }
-                                return ctrl.selectedFontSize || ctrl.terminalFontSizes[2];
-                            };
-                            
-                            $scope.$ctrl = ctrl;
-                        }
+                        fullscreen: false
                     });
                 };
             }]);
