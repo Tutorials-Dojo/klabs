@@ -286,13 +286,13 @@
             .copy-btn {
                 position: absolute;
                 right: 4px;
-                top: 26px;
+                top: 24px;
                 background: transparent;
                 color: #666;
                 border: none;
                 padding: 6px;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 13px;
                 border-radius: 4px;
             }
 
@@ -993,17 +993,17 @@
                                     name: "Getting Started",
                                     commands: [
                                         {
-                                            code: "docker version",
+                                            code: "kubectl version --client",
                                             description: "Check client and server version",
-                                            output: "Client: Docker Engine - Community\nVersion: 20.10.8\nServer: Docker Engine - Community\nEngine:\n  Version: 20.10.8"
+                                            output: "Client Version: v1.30.0\nKustomize Version: v5.0.0\nServer Version: v1.30.0"
                                         },
                                         {
-                                            code: "docker info",
-                                            description: "Display system-wide information"
+                                            code: "kubectl cluster-info",
+                                            description: "Display cluster information"
                                         },
                                         {
-                                            code: "docker run hello-world",
-                                            description: "Run a test container"
+                                            code: "kubectl get nodes",
+                                            description: "List all nodes in the cluster"
                                         }
                                     ]
                                 },
@@ -1011,16 +1011,16 @@
                                     name: "Working with Images",
                                     commands: [
                                         {
-                                            code: "docker pull nginx",
-                                            description: "Download an image"
+                                            code: "kubectl create deployment nginx --image=nginx",
+                                            description: "Deploy an image as a pod"
                                         },
                                         {
-                                            code: "docker images",
-                                            description: "List images"
+                                            code: "kubectl get pods",
+                                            description: "List running pods"
                                         },
                                         {
-                                            code: "docker rmi <image_id>",
-                                            description: "Remove an image"
+                                            code: "kubectl delete pod <pod_name>",
+                                            description: "Remove a pod"
                                         }
                                     ]
                                 },
@@ -1028,16 +1028,16 @@
                                     name: "Container Operations",
                                     commands: [
                                         {
-                                            code: "docker run -d --name mynginx nginx",
-                                            description: "Run a container in detached mode"
+                                            code: "kubectl run mynginx --image=nginx --restart=Never",
+                                            description: "Run a single pod with an image"
                                         },
                                         {
-                                            code: "docker ps",
-                                            description: "List running containers"
+                                            code: "kubectl get deployments",
+                                            description: "List all deployments"
                                         },
                                         {
-                                            code: "docker stop <container_id>",
-                                            description: "Stop a container"
+                                            code: "kubectl delete deployment <deployment_name>",
+                                            description: "Delete a deployment"
                                         }
                                     ]
                                 },
@@ -1045,12 +1045,12 @@
                                     name: "Files & Volumes",
                                     commands: [
                                         {
-                                            code: "docker cp file.txt container:/path/",
-                                            description: "Copy files between host and container"
+                                            code: "kubectl cp file.txt <pod_name>:/path/",
+                                            description: "Copy files between local machine and pod"
                                         },
                                         {
-                                            code: "docker run -v /host/path:/container/path",
-                                            description: "Mount a host directory as a volume"
+                                            code: "kubectl apply -f pvc.yaml",
+                                            description: "Create a PersistentVolumeClaim from YAML"
                                         }
                                     ]
                                 },
@@ -1058,15 +1058,16 @@
                                     name: "Networking & Ports",
                                     commands: [
                                         {
-                                            code: "docker run -p 8080:80 nginx",
-                                            description: "Map container port to host"
+                                            code: "kubectl expose deployment nginx --port=80 --target-port=80 --type=NodePort",
+                                            description: "Expose a deployment on a port"
                                         },
                                         {
-                                            code: "docker network ls",
-                                            description: "List networks"
+                                            code: "kubectl get svc",
+                                            description: "List all services"
                                         }
                                     ]
                                 }
+
                             ];
                             
                             $scope.activeTopic = $scope.topics[0];
@@ -1105,7 +1106,7 @@
                             <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 900px; height: 80vh;">
                                 <md-toolbar>
                                     <div class="md-toolbar-tools">
-                                        <h2>Docker Cheat Sheet</h2>
+                                        <h2>Kubernetes Cheat Sheet</h2>
                                         <span flex></span>
                                         <md-button class="md-icon-button" ng-click="close()">
                                             <md-icon>close</md-icon>
