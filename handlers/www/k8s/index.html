@@ -275,7 +275,7 @@
 
             .detail-item input {
                 width: 100%;
-                padding: 8px 40px 8px 12px;
+                padding: 8px 35px 8px 12px;
                 border: 1px solid #e0e0e0;
                 border-radius: 4px;
                 font-size: 14px;
@@ -286,14 +286,19 @@
             .copy-btn {
                 position: absolute;
                 right: 4px;
-                top: 24px;
+                top: 26px;
                 background: transparent;
                 color: #666;
                 border: none;
-                padding: 6px;
+                padding: 4px;
                 cursor: pointer;
-                font-size: 13px;
+                font-size: 16px;
                 border-radius: 4px;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .copy-btn:hover {
@@ -570,49 +575,13 @@
             }
 
             /* Resource usage indicators */
-            .resource-indicator {
-                display: flex;
-                align-items: center;
-                margin-bottom: 8px;
-            }
-
-            .resource-label {
-                width: 80px;
-                font-weight: 600;
-                color: #666;
-            }
-
-            .resource-value {
-                flex: 1;
-                background: #f0f0f0;
-                height: 20px;
-                border-radius: 10px;
-                overflow: hidden;
-                position: relative;
-            }
-
-            .resource-fill {
-                height: 100%;
-                border-radius: 10px;
-                transition: width 0.3s ease;
-            }
-
-            .memory-fill {
-                background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-            }
-
-            .cpu-fill {
-                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-            }
-
             .resource-text {
-                position: absolute;
-                right: 8px;
-                top: 0;
-                line-height: 20px;
-                font-size: 12px;
+                font-family: 'Roboto Mono', monospace;
+                background: #f0f0f0;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 14px;
                 color: #333;
-                font-weight: 600;
             }
 
             /* Responsive design */
@@ -702,11 +671,18 @@
                 </div>
             </section>
 
+            <!-- Disconnected Screen -->
+            <section ng-if="!connected" class="disconnected">
+                <h1>No connection to server. Reconnecting...</h1>
+                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
+            </section>
+
             <!-- Main Application -->
             <section ng-if="isAlive">
                 <!-- Header -->
                 <div class="main-header">
                     <div class="header-left">
+                        <div class="k8s-logo"></div>
                         <h1 class="header-title">Kubernetes Playground</h1>
                     </div>
                     <div class="header-right">
@@ -754,7 +730,7 @@
                     <div class="terminal-area">
                         <!-- Welcome Screen -->
                         <div ng-if="!instances.length" class="welcome-screen">
-                            <h2>Welcome to the Kubernetes Playground</h2>
+                            <h2>Welcome to Kubernetes Playground</h2>
                             <p>Add instances to your playground to get started.</p>
                             <div class="session-info">
                                 <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
@@ -782,12 +758,8 @@
                                         </div>
                                         <div class="detail-item">
                                             <label>Memory</label>
-                                            <div class="resource-indicator" ng-if="instance.memory">
-                                                <div class="resource-label">Memory</div>
-                                                <div class="resource-value">
-                                                    <div class="resource-fill memory-fill" ng-style="{'width': instance.memory.usagePercent + '%'}"></div>
-                                                    <div class="resource-text">{{instance.memory.usage}} / {{instance.memory.limit}}</div>
-                                                </div>
+                                            <div ng-if="instance.memory">
+                                                <div class="resource-text">{{instance.memory.usage}} / {{instance.memory.limit}} ({{instance.memory.usagePercent}}%)</div>
                                             </div>
                                             <div ng-if="!instance.memory">
                                                 <input value="Not available" type="text" readonly="readonly">
@@ -795,12 +767,8 @@
                                         </div>
                                         <div class="detail-item">
                                             <label>CPU</label>
-                                            <div class="resource-indicator" ng-if="instance.cpu">
-                                                <div class="resource-label">CPU</div>
-                                                <div class="resource-value">
-                                                    <div class="resource-fill cpu-fill" ng-style="{'width': instance.cpu.usagePercent + '%'}"></div>
-                                                    <div class="resource-text">{{instance.cpu.usagePercent}}%</div>
-                                                </div>
+                                            <div ng-if="instance.cpu">
+                                                <div class="resource-text">{{instance.cpu.usagePercent}}%</div>
                                             </div>
                                             <div ng-if="!instance.cpu">
                                                 <input value="Not available" type="text" readonly="readonly">
@@ -810,7 +778,7 @@
                                             <label>Direct URL</label>
                                             <input value="{{instance.proxy_host}}.direct.{{host}}" type="text" readonly="readonly">
                                             <button class="copy-btn" ng-click="copyToClipboard(instance.proxy_host + '.direct.' + host)">
-                                                <md-icon>content_copy</md-icon>
+                                                <md-icon style="font-size: 16px;">content_copy</md-icon>
                                             </button>
                                         </div>
                                     </div>
@@ -984,6 +952,16 @@
                 // Initialize the timer when the app starts
                 $rootScope.initTimer();
                 
+                // Function to execute commands in the terminal
+                $rootScope.executeCommand = function(command) {
+                    if ($rootScope.selectedInstance && $rootScope.selectedInstance.terminal) {
+                        var term = $rootScope.selectedInstance.terminal;
+                        term.write(command + '\r');
+                    } else {
+                        console.error('No terminal available for selected instance');
+                    }
+                };
+                
                 // Cheat sheet with categories
                 $rootScope.showCheatSheet = function() {
                     $mdDialog.show({
@@ -993,9 +971,9 @@
                                     name: "Getting Started",
                                     commands: [
                                         {
-                                            code: "kubectl version --client",
+                                            code: "kubectl version",
                                             description: "Check client and server version",
-                                            output: "Client Version: v1.30.0\nKustomize Version: v5.0.0\nServer Version: v1.30.0"
+                                            output: "Client Version: v1.25.0\nServer Version: v1.25.0"
                                         },
                                         {
                                             code: "kubectl cluster-info",
@@ -1008,66 +986,65 @@
                                     ]
                                 },
                                 {
-                                    name: "Working with Images",
+                                    name: "Working with Pods",
                                     commands: [
                                         {
-                                            code: "kubectl create deployment nginx --image=nginx",
-                                            description: "Deploy an image as a pod"
-                                        },
-                                        {
                                             code: "kubectl get pods",
-                                            description: "List running pods"
+                                            description: "List all pods in the current namespace"
                                         },
                                         {
-                                            code: "kubectl delete pod <pod_name>",
-                                            description: "Remove a pod"
+                                            code: "kubectl describe pod <pod-name>",
+                                            description: "Show detailed information about a pod"
+                                        },
+                                        {
+                                            code: "kubectl logs <pod-name>",
+                                            description: "Show logs from a pod"
                                         }
                                     ]
                                 },
                                 {
-                                    name: "Container Operations",
+                                    name: "Deployments",
                                     commands: [
                                         {
-                                            code: "kubectl run mynginx --image=nginx --restart=Never",
-                                            description: "Run a single pod with an image"
+                                            code: "kubectl create deployment nginx --image=nginx",
+                                            description: "Create a deployment"
                                         },
                                         {
                                             code: "kubectl get deployments",
                                             description: "List all deployments"
                                         },
                                         {
-                                            code: "kubectl delete deployment <deployment_name>",
-                                            description: "Delete a deployment"
+                                            code: "kubectl scale deployment nginx --replicas=3",
+                                            description: "Scale a deployment"
                                         }
                                     ]
                                 },
                                 {
-                                    name: "Files & Volumes",
+                                    name: "Services",
                                     commands: [
                                         {
-                                            code: "kubectl cp file.txt <pod_name>:/path/",
-                                            description: "Copy files between local machine and pod"
+                                            code: "kubectl expose deployment nginx --port=80 --type=NodePort",
+                                            description: "Expose a deployment as a service"
                                         },
                                         {
-                                            code: "kubectl apply -f pvc.yaml",
-                                            description: "Create a PersistentVolumeClaim from YAML"
-                                        }
-                                    ]
-                                },
-                                {
-                                    name: "Networking & Ports",
-                                    commands: [
-                                        {
-                                            code: "kubectl expose deployment nginx --port=80 --target-port=80 --type=NodePort",
-                                            description: "Expose a deployment on a port"
-                                        },
-                                        {
-                                            code: "kubectl get svc",
+                                            code: "kubectl get services",
                                             description: "List all services"
                                         }
                                     ]
+                                },
+                                {
+                                    name: "Configuration",
+                                    commands: [
+                                        {
+                                            code: "kubectl apply -f config.yaml",
+                                            description: "Apply configuration from a file"
+                                        },
+                                        {
+                                            code: "kubectl get configmaps",
+                                            description: "List all config maps"
+                                        }
+                                    ]
                                 }
-
                             ];
                             
                             $scope.activeTopic = $scope.topics[0];
@@ -1077,8 +1054,8 @@
                             };
                             
                             $scope.runCommand = function(command) {
-                                // This would need to be implemented to send commands to the terminal
-                                console.log("Running command:", command);
+                                $rootScope.executeCommand(command);
+                                $mdDialog.hide();
                             };
                             
                             $scope.copyCommand = function(command) {
@@ -1103,7 +1080,7 @@
                             };
                         },
                         template: `
-                            <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 1100px; height: 80vh;">
+                            <md-dialog aria-label="Kubernetes Cheat Sheet" style="max-width: 1000px; height: 80vh;">
                                 <md-toolbar>
                                     <div class="md-toolbar-tools">
                                         <h2>Kubernetes Cheat Sheet</h2>
@@ -1147,36 +1124,41 @@
                     });
                 };
                 
-                // Simulate resource usage data (replace with actual data from WebSocket)
-                $rootScope.updateResourceUsage = function() {
-                    if ($rootScope.instances && $rootScope.instances.length > 0) {
-                        $rootScope.instances.forEach(function(instance) {
-                            // Simulate memory usage
-                            instance.memory = {
-                                usage: (Math.floor(Math.random() * 4) + 1) + 'GB',
-                                limit: '4GB',
-                                usagePercent: Math.floor(Math.random() * 60) + 20
-                            };
-                            
-                            // Simulate CPU usage
-                            instance.cpu = {
-                                usagePercent: Math.floor(Math.random() * 70) + 10
-                            };
-                        });
+                // Listen for WebSocket messages for real resource usage data
+                // This would need to be implemented based on your backend WebSocket API
+                $rootScope.connectWebSocket = function() {
+                    // This is a placeholder for your WebSocket connection logic
+                    // Replace with your actual WebSocket implementation
+                    console.log("WebSocket connection would be established here");
+                    
+                    // Example of how you might handle WebSocket messages
+                    /*
+                    var ws = new WebSocket('wss://your-websocket-endpoint');
+                    
+                    ws.onmessage = function(event) {
+                        var data = JSON.parse(event.data);
                         
-                        if (!$rootScope.$$phase) {
-                            $rootScope.$apply();
+                        if (data.type === 'resource_usage') {
+                            // Update instance resource usage
+                            var instance = $rootScope.instances.find(function(inst) {
+                                return inst.name === data.instance;
+                            });
+                            
+                            if (instance) {
+                                instance.memory = data.memory;
+                                instance.cpu = data.cpu;
+                                
+                                if (!$rootScope.$$phase) {
+                                    $rootScope.$apply();
+                                }
+                            }
                         }
-                    }
+                    };
+                    */
                 };
                 
-                // Periodically update resource usage (replace with real WebSocket updates)
-                setInterval(function() {
-                    $rootScope.updateResourceUsage();
-                }, 5000);
-                
-                // Initial update
-                $rootScope.updateResourceUsage();
+                // Initialize WebSocket connection
+                $rootScope.connectWebSocket();
             }]);
         </script>
     </body>
