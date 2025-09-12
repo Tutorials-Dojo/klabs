@@ -114,7 +114,7 @@
             }
 
             .add-instance-btn {
-                background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%) !important;
+                background: #2e7d32 !important;
                 color: white !important;
                 width: 100%;
                 padding: 12px !important;
@@ -671,12 +671,6 @@
                 </div>
             </section>
 
-            <!-- Disconnected Screen -->
-            <section ng-if="!connected" class="disconnected">
-                <h1>No connection to server. Reconnecting...</h1>
-                <md-progress-circular class="md-hue-2" md-diameter="20px"></md-progress-circular>
-            </section>
-
             <!-- Main Application -->
             <section ng-if="isAlive">
                 <!-- Header -->
@@ -1124,41 +1118,15 @@
                     });
                 };
                 
-                // Listen for WebSocket messages for real resource usage data
-                // This would need to be implemented based on your backend WebSocket API
-                $rootScope.connectWebSocket = function() {
-                    // This is a placeholder for your WebSocket connection logic
-                    // Replace with your actual WebSocket implementation
-                    console.log("WebSocket connection would be established here");
-                    
-                    // Example of how you might handle WebSocket messages
-                    /*
-                    var ws = new WebSocket('wss://your-websocket-endpoint');
-                    
-                    ws.onmessage = function(event) {
-                        var data = JSON.parse(event.data);
-                        
-                        if (data.type === 'resource_usage') {
-                            // Update instance resource usage
-                            var instance = $rootScope.instances.find(function(inst) {
-                                return inst.name === data.instance;
-                            });
-                            
-                            if (instance) {
-                                instance.memory = data.memory;
-                                instance.cpu = data.cpu;
-                                
-                                if (!$rootScope.$$phase) {
-                                    $rootScope.$apply();
-                                }
-                            }
-                        }
-                    };
-                    */
-                };
-                
-                // Initialize WebSocket connection
-                $rootScope.connectWebSocket();
+                // Override any existing timer initialization that might be setting 2 hours
+                // This ensures our 15-minute timer takes precedence
+                $timeout(function() {
+                    // Reinitialize timer to make sure it's set to 15 minutes
+                    if ($rootScope.timerInterval) {
+                        clearInterval($rootScope.timerInterval);
+                    }
+                    $rootScope.initTimer();
+                }, 1000);
             }]);
         </script>
     </body>
