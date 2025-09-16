@@ -294,8 +294,8 @@
                 cursor: pointer;
                 font-size: 16px;
                 border-radius: 4px;
-                width: 24px;
-                height: 24px;
+                width: 19px;
+                height: 19px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -441,7 +441,8 @@
             .cheat-sheet-container {
                 display: flex;
                 height: 70vh;
-                max-height: 600px;
+                max-height: 650px;
+                min-width: 700px;
             }
 
             .cheat-sidebar {
@@ -501,6 +502,7 @@
                 display: block;
                 margin-bottom: 10px;
                 position: relative;
+                min-width: 600px;
             }
 
             .command-actions {
@@ -1046,10 +1048,10 @@
                                 $scope.activeTopic = topic;
                             };
                             
-                            $scope.runCommand = function(command) {
-                                $rootScope.executeCommand(command);
-                                $mdDialog.hide();
-                            };
+                            // $scope.runCommand = function(command) {
+                            //     $rootScope.executeCommand(command);
+                            //     $mdDialog.hide();
+                            // };
                             
                             $scope.copyCommand = function(command) {
                                 var textArea = document.createElement("textarea");
@@ -1098,7 +1100,7 @@
                                                 <div class="command-desc">{{command.description}}</div>
                                                 <code class="command-code">{{command.code}}</code>
                                                 <div class="command-actions">
-                                                    <button class="command-btn" ng-click="runCommand(command.code)">Run</button>
+                                                    // <button class="command-btn" ng-click="runCommand(command.code)">Run</button>
                                                     <button class="command-btn" ng-click="copyCommand(command.code)">Copy</button>
                                                 </div>
                                                 <div ng-if="command.output" style="margin-top: 10px;">
