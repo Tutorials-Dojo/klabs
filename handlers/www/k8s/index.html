@@ -286,7 +286,7 @@
             .copy-btn {
                 position: absolute;
                 right: 4px;
-                top: 26px;
+                top: 22px;
                 background: transparent;
                 color: #666;
                 border: none;
@@ -441,7 +441,7 @@
             .cheat-sheet-container {
                 display: flex;
                 height: 70vh;
-                max-height: 650px;
+                max-height: 700px;
                 min-width: 700px;
             }
 
@@ -1100,7 +1100,6 @@
                                                 <div class="command-desc">{{command.description}}</div>
                                                 <code class="command-code">{{command.code}}</code>
                                                 <div class="command-actions">
-                                                    // <button class="command-btn" ng-click="runCommand(command.code)">Run</button>
                                                     <button class="command-btn" ng-click="copyCommand(command.code)">Copy</button>
                                                 </div>
                                                 <div ng-if="command.output" style="margin-top: 10px;">
