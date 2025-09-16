@@ -27,7 +27,7 @@
     $scope.idxByHostname = {};
     $rootScope.selectedInstance = null;
     $scope.isAlive = true;
-    $scope.ttl = '--:15:00';
+    $scope.ttl = '15:00';
     $scope.connected = false;
     $scope.type = {windows: false};
     $scope.isInstanceBeingCreated = false;
@@ -170,13 +170,31 @@
       }).then(function(response) {
         $scope.setSessionState(response.data.ready);
 
-        if (response.data.created_at) {
-          $scope.expiresAt = moment(response.data.expires_at);
-          setInterval(function() {
-            $scope.ttl = moment.utc($scope.expiresAt.diff(moment())).format('HH:mm:ss');
+      if (response.data.created_at) {
+        $scope.sessionDuration = 900000; // 15 minutes in milliseconds
+        $scope.sessionStartTime = new Date().getTime();
+        
+        // Update timer every second
+        $scope.timerInterval = setInterval(function() {
+          var elapsed = new Date().getTime() - $scope.sessionStartTime;
+          var remaining = Math.max(0, $scope.sessionDuration - elapsed);
+          
+          var minutes = Math.floor(remaining / 60000);
+          var seconds = Math.floor((remaining % 60000) / 1000);
+          
+          $scope.ttl = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+          
+          // Force Angular to update the view
+          if (!$scope.$$phase) {
             $scope.$apply();
-          }, 1000);
-        }
+          }
+          
+          // Check if session has ended
+          if (remaining <= 0) {
+            // This will be handled by the server's session end event
+          }
+        }, 1000);
+      }
 
         var i = response.data;
         for (var k in i.instances) {
@@ -280,12 +298,13 @@
         });
 
         socket.on('session end', function() {
-          $scope.showAlert('Session timed out!', 'Your session has expired and all of your instances have been deleted.', '#sessionEnd', function() {
-            window.location.href = '/';
-          });
-          $scope.isAlive = false;
-          socket.close();
+        clearInterval($scope.timerInterval); // Clear the timer interval
+        $scope.showAlert('Session timed out!', 'Your session has expired and all of your instances have been deleted.', '#sessionEnd', function() {
+          window.location.href = '/';
         });
+        $scope.isAlive = false;
+        socket.close();
+      });
 
         socket.on('instance new', function(name, ip, hostname, proxyHost) {
           var instance = $scope.upsertInstance({ name: name, ip: ip, hostname: hostname, proxy_host: proxyHost, session_id: $scope.sessionId});
