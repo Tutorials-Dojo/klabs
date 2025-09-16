@@ -27,7 +27,7 @@
     $scope.idxByHostname = {};
     $rootScope.selectedInstance = null;
     $scope.isAlive = true;
-    $scope.ttl = '--:--:--';
+    $scope.ttl = '--:15:00';
     $scope.connected = false;
     $scope.type = {windows: false};
     $scope.isInstanceBeingCreated = false;
