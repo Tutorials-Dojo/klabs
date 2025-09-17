@@ -251,6 +251,28 @@
                 font-weight: 600;
                 color: #1a237e;
                 margin: 0 0 16px 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .k8s-disclaimer-btn {
+                background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+                color: white !important;
+                border: none !important;
+                padding: 8px 16px !important;
+                border-radius: 20px !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                cursor: pointer;
+            }
+
+            .k8s-disclaimer-btn:hover {
+                background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%) !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
             }
 
             .instance-details {
@@ -576,6 +598,87 @@
                 transform: translateY(-1px);
             }
 
+            /* Kubernetes Disclaimer Modal */
+            .k8s-disclaimer-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10001;
+            }
+
+            .k8s-disclaimer-content {
+                background: white;
+                padding: 40px;
+                border-radius: 12px;
+                text-align: center;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            }
+
+            .k8s-disclaimer-content h2 {
+                color: #1a237e;
+                margin-top: 0;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .k8s-icon {
+                width: 32px;
+                height: 32px;
+                background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJMMjggMTBWMjJMMTYgMzBMNCAyMlYxMEwxNiAyWiIgZmlsbD0iIzMyNkNFNSIvPgo8cGF0aCBkPSJNMTYgNkwyNC44IDEyVjIwTDE2IDI2TDcuMiAyMFYxMkwxNiA2WiIgZmlsbD0id2hpdGUiLz4KPHA+PC9wYXRoPgo8L3N2Zz4K') center/contain no-repeat;
+            }
+
+            .k8s-disclaimer-content p {
+                color: #555;
+                line-height: 1.6;
+                margin-bottom: 16px;
+                font-size: 16px;
+            }
+
+            .k8s-disclaimer-content .warning-text {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 16px;
+                color: #856404;
+                font-weight: 500;
+                margin-bottom: 24px;
+            }
+
+            .k8s-disclaimer-buttons {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+            }
+
+            .k8s-disclaimer-content button {
+                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s ease;
+                font-size: 16px;
+            }
+
+            .k8s-disclaimer-content button:hover {
+                background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            }
+
             /* Resource usage indicators */
             .resource-text {
                 font-family: 'Roboto Mono', monospace;
@@ -673,6 +776,25 @@
                 </div>
             </section>
 
+            <!-- Kubernetes Disclaimer Modal -->
+            <section ng-if="showK8sDisclaimer" class="k8s-disclaimer-modal">
+                <div class="k8s-disclaimer-content">
+                    <h2>
+                        <div class="k8s-icon"></div>
+                        Kubernetes Cluster Initialization
+                    </h2>
+                    <p>Welcome to your Kubernetes playground! This instance is setting up a Kubernetes cluster for you.</p>
+                    <div class="warning-text">
+                        <strong>⚠️ Please wait approximately 30 seconds</strong><br>
+                        The Kubernetes cluster is initializing and will be ready shortly. You can start using kubectl commands once the initialization is complete.
+                    </div>
+                    <p>You'll see the terminal prompt once everything is ready to use.</p>
+                    <div class="k8s-disclaimer-buttons">
+                        <button ng-click="closeK8sDisclaimer()">Got It</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Main Application -->
             <section ng-if="isAlive">
                 <!-- Header -->
@@ -724,11 +846,20 @@
                     <!-- Terminal Area -->
                     <div class="terminal-area">
                         <!-- Welcome Screen -->
-                        <div ng-if="!instances.length" class="welcome-screen">
+                        <div ng-if="!instances.length && !isCreatingInitialInstance" class="welcome-screen">
                             <h2>Welcome to Kubernetes Playground</h2>
-                            <p>Add instances to your playground to get started.</p>
+                            <p>Setting up your initial Kubernetes instance...</p>
                             <div class="session-info">
                                 <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
+                            </div>
+                        </div>
+
+                        <!-- Creating Initial Instance Screen -->
+                        <div ng-if="isCreatingInitialInstance" class="welcome-screen">
+                            <h2>Creating Your Kubernetes Instance</h2>
+                            <p>Please wait while we set up your Kubernetes playground...</p>
+                            <div class="session-info">
+                                <strong>This will take just a moment.</strong>
                             </div>
                         </div>
 
@@ -745,7 +876,12 @@
                             <!-- Instance Details Card -->
                             <div class="instance-card">
                                 <div class="instance-card-header">
-                                    <div class="instance-card-title">{{instance.name}}</div>
+                                    <div class="instance-card-title">
+                                        {{instance.name}}
+                                        <button class="k8s-disclaimer-btn" ng-click="showK8sDisclaimer = true">
+                                            K8s Info
+                                        </button>
+                                    </div>
                                     <div class="instance-details">
                                         <div class="detail-item">
                                             <label>IP Address</label>
@@ -882,6 +1018,34 @@
                 // Set session timeout to 15 minutes (900000 milliseconds)
                 $rootScope.sessionDuration = 900000;
                 
+                // Initialize variables
+                $rootScope.showK8sDisclaimer = false;
+                $rootScope.isCreatingInitialInstance = false;
+                
+                // Function to close K8s disclaimer
+                $rootScope.closeK8sDisclaimer = function() {
+                    $rootScope.showK8sDisclaimer = false;
+                };
+                
+                // Function to create initial instance
+                $rootScope.createInitialInstance = function() {
+                    $rootScope.isCreatingInitialInstance = true;
+                    
+                    // Simulate instance creation process
+                    $timeout(function() {
+                        // This should call your existing newInstance() function
+                        if (typeof $rootScope.newInstance === 'function') {
+                            $rootScope.newInstance();
+                        }
+                        $rootScope.isCreatingInitialInstance = false;
+                        
+                        // Show the K8s disclaimer when the first instance is created
+                        $timeout(function() {
+                            $rootScope.showK8sDisclaimer = true;
+                        }, 1000);
+                    }, 2000); // Wait 2 seconds to simulate creation
+                };
+                
                 // Initialize timer
                 $rootScope.initTimer = function() {
                     $rootScope.ttl = "15:00";
@@ -898,7 +1062,7 @@
                         $rootScope.ttl = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
                         
                         // Force Angular to update the view
-                        if (!$rootScope.$$phase) {
+                        if (!$rootScope.$phase) {
                             $rootScope.$apply();
                         }
                         
@@ -946,6 +1110,13 @@
                 
                 // Initialize the timer when the app starts
                 $rootScope.initTimer();
+                
+                // Create initial instance when the app starts
+                $timeout(function() {
+                    if ($rootScope.isAlive && (!$rootScope.instances || $rootScope.instances.length === 0)) {
+                        $rootScope.createInitialInstance();
+                    }
+                }, 1000);
                 
                 // Function to execute commands in the terminal
                 $rootScope.executeCommand = function(command) {
@@ -1048,11 +1219,6 @@
                                 $scope.activeTopic = topic;
                             };
                             
-                            // $scope.runCommand = function(command) {
-                            //     $rootScope.executeCommand(command);
-                            //     $mdDialog.hide();
-                            // };
-                            
                             $scope.copyCommand = function(command) {
                                 var textArea = document.createElement("textarea");
                                 textArea.value = command;
@@ -1117,76 +1283,6 @@
                         fullscreen: false
                     });
                 };
-
-                // Add to your existing Angular run block
-                angular.module('DockerPlay').run(['$rootScope', '$mdDialog', '$timeout', '$interval', 
-                function($rootScope, $mdDialog, $timeout, $interval) {
-                    // Auto-create instance on session start
-                    $rootScope.$watch('instances', function(newVal) {
-                        if (newVal && newVal.length === 0) {
-                            $timeout(function() {
-                                if ($rootScope.instances.length === 0) {
-                                    $rootScope.newInstance();
-                                }
-                            }, 2000);
-                        }
-                    });
-
-                    // Track initialization status
-                    $rootScope.initializing = true;
-                    $rootScope.initializationProgress = 0;
-                    
-                    // Show initialization modal
-                    var showInitializationModal = function() {
-                        $mdDialog.show({
-                            controller: function($scope, $mdDialog, $interval) {
-                                $scope.progress = 0;
-                                
-                                // Simulate progress (you can replace with actual initialization tracking)
-                                var progressInterval = $interval(function() {
-                                    $scope.progress += 2;
-                                    if ($scope.progress >= 100) {
-                                        $interval.cancel(progressInterval);
-                                        $mdDialog.hide();
-                                        $rootScope.initializing = false;
-                                    }
-                                }, 600);
-                                
-                                $scope.cancel = function() {
-                                    $interval.cancel(progressInterval);
-                                    $mdDialog.cancel();
-                                };
-                            },
-                            template: `
-                                <md-dialog aria-label="Kubernetes Cluster Initializing" style="max-width: 500px;">
-                                    <md-toolbar>
-                                        <div class="md-toolbar-tools">
-                                            <h2>Kubernetes Cluster Initializing</h2>
-                                            <span flex></span>
-                                        </div>
-                                    </md-toolbar>
-                                    <md-dialog-content style="padding: 20px;">
-                                        <p>Your Kubernetes environment is being prepared. This usually takes about 30 seconds.</p>
-                                        <p>Please wait while we set up your cluster...</p>
-                                        <md-progress-linear md-mode="determinate" value="{{progress}}"></md-progress-linear>
-                                        <p style="text-align: center; margin-top: 10px;">{{progress}}% Complete</p>
-                                    </md-dialog-content>
-                                </md-dialog>
-                            `,
-                            parent: angular.element(document.body),
-                            clickOutsideToClose: false,
-                            fullscreen: false
-                        });
-                    };
-                    
-                    // Show modal shortly after instance creation
-                    $rootScope.$on('instanceCreated', function() {
-                        $timeout(showInitializationModal, 1000);
-                    });
-                    
-                    // Add this event emitter to your newInstance function
-                    // You'll need to modify your app.js to emit this event
-                }]);
                 
                 // This ensures our 15-minute timer takes precedence
                 $timeout(function() {
