@@ -1117,6 +1117,76 @@
                         fullscreen: false
                     });
                 };
+
+                // Add to your existing Angular run block
+                angular.module('DockerPlay').run(['$rootScope', '$mdDialog', '$timeout', '$interval', 
+                function($rootScope, $mdDialog, $timeout, $interval) {
+                    // Auto-create instance on session start
+                    $rootScope.$watch('instances', function(newVal) {
+                        if (newVal && newVal.length === 0) {
+                            $timeout(function() {
+                                if ($rootScope.instances.length === 0) {
+                                    $rootScope.newInstance();
+                                }
+                            }, 2000);
+                        }
+                    });
+
+                    // Track initialization status
+                    $rootScope.initializing = true;
+                    $rootScope.initializationProgress = 0;
+                    
+                    // Show initialization modal
+                    var showInitializationModal = function() {
+                        $mdDialog.show({
+                            controller: function($scope, $mdDialog, $interval) {
+                                $scope.progress = 0;
+                                
+                                // Simulate progress (you can replace with actual initialization tracking)
+                                var progressInterval = $interval(function() {
+                                    $scope.progress += 2;
+                                    if ($scope.progress >= 100) {
+                                        $interval.cancel(progressInterval);
+                                        $mdDialog.hide();
+                                        $rootScope.initializing = false;
+                                    }
+                                }, 600);
+                                
+                                $scope.cancel = function() {
+                                    $interval.cancel(progressInterval);
+                                    $mdDialog.cancel();
+                                };
+                            },
+                            template: `
+                                <md-dialog aria-label="Kubernetes Cluster Initializing" style="max-width: 500px;">
+                                    <md-toolbar>
+                                        <div class="md-toolbar-tools">
+                                            <h2>Kubernetes Cluster Initializing</h2>
+                                            <span flex></span>
+                                        </div>
+                                    </md-toolbar>
+                                    <md-dialog-content style="padding: 20px;">
+                                        <p>Your Kubernetes environment is being prepared. This usually takes about 30 seconds.</p>
+                                        <p>Please wait while we set up your cluster...</p>
+                                        <md-progress-linear md-mode="determinate" value="{{progress}}"></md-progress-linear>
+                                        <p style="text-align: center; margin-top: 10px;">{{progress}}% Complete</p>
+                                    </md-dialog-content>
+                                </md-dialog>
+                            `,
+                            parent: angular.element(document.body),
+                            clickOutsideToClose: false,
+                            fullscreen: false
+                        });
+                    };
+                    
+                    // Show modal shortly after instance creation
+                    $rootScope.$on('instanceCreated', function() {
+                        $timeout(showInitializationModal, 1000);
+                    });
+                    
+                    // Add this event emitter to your newInstance function
+                    // You'll need to modify your app.js to emit this event
+                }]);
                 
                 // This ensures our 15-minute timer takes precedence
                 $timeout(function() {
