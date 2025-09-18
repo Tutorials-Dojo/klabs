@@ -845,23 +845,6 @@
 
                     <!-- Terminal Area -->
                     <div class="terminal-area">
-                        <!-- Welcome Screen -->
-                        <div ng-if="!instances.length && !isCreatingInitialInstance" class="welcome-screen">
-                            <h2>Welcome to Kubernetes Playground</h2>
-                            <p>Setting up your initial Kubernetes instance...</p>
-                            <div class="session-info">
-                                <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
-                            </div>
-                        </div>
-
-                        <!-- Creating Initial Instance Screen -->
-                        <div ng-if="isCreatingInitialInstance" class="welcome-screen">
-                            <h2>Creating Your Kubernetes Instance</h2>
-                            <p>Please wait while we set up your Kubernetes playground...</p>
-                            <div class="session-info">
-                                <strong>This will take just a moment.</strong>
-                            </div>
-                        </div>
 
                         <!-- Instance Content -->
                         <div ng-repeat="instance in instances" 
@@ -878,9 +861,6 @@
                                 <div class="instance-card-header">
                                     <div class="instance-card-title">
                                         {{instance.name}}
-                                        <button class="k8s-disclaimer-btn" ng-click="showK8sDisclaimer = true">
-                                            K8s Info
-                                        </button>
                                     </div>
                                     <div class="instance-details">
                                         <div class="detail-item">
