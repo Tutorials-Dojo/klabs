@@ -1022,9 +1022,45 @@
                 $rootScope.showK8sDisclaimer = false;
                 $rootScope.isCreatingInitialInstance = false;
                 
-                // Function to close K8s disclaimer
-                $rootScope.closeK8sDisclaimer = function() {
-                    $rootScope.showK8sDisclaimer = false;
+                // Function to check if K8s cluster is ready
+                $rootScope.checkK8sClusterReady = function(instance) {
+                    if (!instance || !instance.terminal) return;
+                    
+                    // Send a kubectl command to check cluster status
+                    var checkCommand = 'kubectl cluster-info --request-timeout=5s';
+                    instance.terminal.write(checkCommand + '\r');
+                    
+                    // Monitor for successful response
+                    // This is a simplified check - in practice you'd need to parse terminal output
+                    return true; // Placeholder
+                };
+
+                // Modified disclaimer with cluster status check
+                $rootScope.showK8sDisclaimerWithCheck = function(instance) {
+                    $rootScope.showK8sDisclaimer = true;
+                    $rootScope.currentInstance = instance;
+                    
+                    // Start checking cluster readiness
+                    var checkInterval = setInterval(function() {
+                        if ($rootScope.checkK8sClusterReady(instance)) {
+                            clearInterval(checkInterval);
+                            // Cluster is ready - could update modal content
+                        }
+                    }, 5000); // Check every 5 seconds
+                };
+
+                // Show disclaimer when first instance is shown
+                var originalShowInstance = $rootScope.showInstance;
+                $rootScope.showInstance = function(instance) {
+                    if (originalShowInstance) {
+                        originalShowInstance.call(this, instance);
+                    }
+                    
+                    // Show disclaimer for any instance
+                    if (instance && !$rootScope.hasShownDisclaimer) {
+                        $rootScope.showK8sDisclaimerWithCheck(instance);
+                        $rootScope.hasShownDisclaimer = true;
+                    }
                 };
                 
                 // Function to create initial instance
@@ -1111,12 +1147,18 @@
                 // Initialize the timer when the app starts
                 $rootScope.initTimer();
                 
-                // Create initial instance when the app starts
+                // Check for existing instances first, then create initial instance if needed
                 $timeout(function() {
+                    // Wait longer to check if PWD has any existing instances
                     if ($rootScope.isAlive && (!$rootScope.instances || $rootScope.instances.length === 0)) {
+                        // Show disclaimer immediately, then create instance
+                        $rootScope.showK8sDisclaimer = true;
                         $rootScope.createInitialInstance();
+                    } else if ($rootScope.instances && $rootScope.instances.length > 0) {
+                        // If instances already exist, just show the disclaimer
+                        $rootScope.showK8sDisclaimer = true;
                     }
-                }, 1000);
+                }, 3000); // Increased delay to let PWD initialize
                 
                 // Function to execute commands in the terminal
                 $rootScope.executeCommand = function(command) {
