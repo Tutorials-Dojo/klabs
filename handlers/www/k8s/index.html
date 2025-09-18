@@ -845,21 +845,12 @@
 
                     <!-- Terminal Area -->
                     <div class="terminal-area">
-                        <!-- Welcome Screen -->
-                        <div ng-if="!instances.length && !isCreatingInitialInstance" class="welcome-screen">
+                        <!-- Welcome Screen - Show when no instances exist -->
+                        <div ng-if="!instances.length" class="welcome-screen">
                             <h2>Welcome to Kubernetes Playground</h2>
-                            <p>Setting up your initial Kubernetes instance...</p>
+                            <p>Click "Add New Instance" to create your first Kubernetes cluster.</p>
                             <div class="session-info">
                                 <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
-                            </div>
-                        </div>
-
-                        <!-- Creating Initial Instance Screen -->
-                        <div ng-if="isCreatingInitialInstance" class="welcome-screen">
-                            <h2>Creating Your Kubernetes Instance</h2>
-                            <p>Please wait while we set up your Kubernetes playground...</p>
-                            <div class="session-info">
-                                <strong>This will take just a moment.</strong>
                             </div>
                         </div>
 
