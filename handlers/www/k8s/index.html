@@ -846,6 +846,17 @@
                     <!-- Terminal Area -->
                     <div class="terminal-area">
 
+                        <!-- Welcome Screen - Show when no instances exist -->
+                        <div ng-if="!instances.length" class="welcome-screen">
+                        <!-- Welcome Screen -->
+                        <div ng-if="!instances.length && !isCreatingInitialInstance" class="welcome-screen">
+                            <h2>Welcome to Kubernetes Playground</h2>
+                            <p>Click "Add New Instance" to create your first Kubernetes cluster.</p>
+                            <div class="session-info">
+                                <strong>Sessions and all their instances are deleted after {{ttl}} minutes.</strong>
+                            </div>
+                        </div>
+
                         <!-- Instance Content -->
                         <div ng-repeat="instance in instances" 
                              ng-show="instance.name == selectedInstance.name" 
