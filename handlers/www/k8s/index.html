@@ -365,6 +365,43 @@
                 box-shadow: none !important;
             }
 
+            /* Terminal Shortcuts in Instance Actions */
+            .instance-actions {
+                padding: 20px;
+                border-top: 1px solid #e0e0e0;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .terminal-shortcuts {
+                color: #555;
+                font-size: 13px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            .terminal-shortcuts strong {
+                color: #333;
+                margin-right: 4px;
+            }
+            
+            .terminal-shortcuts code {
+                background: #f0f0f0;
+                padding: 3px 6px;
+                border-radius: 4px;
+                font-family: 'Roboto Mono', monospace;
+                color: #1a237e;
+                font-size: 12px;
+                font-weight: 500;
+            }
+            
+            .terminal-shortcuts .divider {
+                color: #ccc;
+                margin: 0 4px;
+            }
+
             .cheat-sheet-btn {
                 background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%) !important;
                 color: white !important;
@@ -811,6 +848,13 @@
                                     <button class="delete-instance-btn" ng-click="deleteInstance(instance)" ng-disabled="isInstanceBeingDeleted">
                                         {{deleteInstanceBtnText || 'Delete Instance'}}
                                     </button>
+                                    
+                                    <div class="terminal-shortcuts">
+                                        <strong>Shortcuts:</strong> 
+                                        <code>Ctrl + Insert</code> : Copy <span class="divider">|</span>
+                                        <code>Shift + Insert</code> : Paste <span class="divider">|</span>
+                                        <code>Ctrl + Shift + V</code> : Paste
+                                    </div>
                                 </div>
                             </div>
 
