@@ -256,25 +256,6 @@
                 justify-content: space-between;
             }
 
-            .k8s-disclaimer-btn {
-                background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
-                color: white !important;
-                border: none !important;
-                padding: 8px 16px !important;
-                border-radius: 20px !important;
-                font-size: 12px !important;
-                font-weight: 500 !important;
-                transition: all 0.3s ease !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                cursor: pointer;
-            }
-
-            .k8s-disclaimer-btn:hover {
-                background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%) !important;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
-            }
-
             .instance-details {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -598,85 +579,10 @@
                 transform: translateY(-1px);
             }
 
-            /* Kubernetes Disclaimer Modal */
-            .k8s-disclaimer-modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10001;
-            }
-
-            .k8s-disclaimer-content {
-                background: white;
-                padding: 40px;
-                border-radius: 12px;
-                text-align: center;
-                max-width: 500px;
-                width: 90%;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            }
-
-            .k8s-disclaimer-content h2 {
-                color: #1a237e;
-                margin-top: 0;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 12px;
-            }
-
             .k8s-icon {
                 width: 32px;
                 height: 32px;
                 background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJMMjggMTBWMjJMMTYgMzBMNCAyMlYxMEwxNiAyWiIgZmlsbD0iIzMyNkNFNSIvPgo8cGF0aCBkPSJNMTYgNkwyNC44IDEyVjIwTDE2IDI2TDcuMiAyMFYxMkwxNiA2WiIgZmlsbD0id2hpdGUiLz4KPHA+PC9wYXRoPgo8L3N2Zz4K') center/contain no-repeat;
-            }
-
-            .k8s-disclaimer-content p {
-                color: #555;
-                line-height: 1.6;
-                margin-bottom: 16px;
-                font-size: 16px;
-            }
-
-            .k8s-disclaimer-content .warning-text {
-                background: #fff3cd;
-                border: 1px solid #ffeaa7;
-                border-radius: 8px;
-                padding: 16px;
-                color: #856404;
-                font-weight: 500;
-                margin-bottom: 24px;
-            }
-
-            .k8s-disclaimer-buttons {
-                display: flex;
-                gap: 12px;
-                justify-content: center;
-            }
-
-            .k8s-disclaimer-content button {
-                background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-                color: white;
-                border: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                font-size: 16px;
-            }
-
-            .k8s-disclaimer-content button:hover {
-                background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
             }
 
             /* Resource usage indicators */
@@ -773,25 +679,6 @@
                     <h2>Session Timeout</h2>
                     <p>Your session has ended after 15 minutes. All instances have been terminated.</p>
                     <button ng-click="redirectToLanding()">Got It</button>
-                </div>
-            </section>
-
-            <!-- Kubernetes Disclaimer Modal -->
-            <section ng-if="showK8sDisclaimer" class="k8s-disclaimer-modal">
-                <div class="k8s-disclaimer-content">
-                    <h2>
-                        <div class="k8s-icon"></div>
-                        Kubernetes Cluster Initialization
-                    </h2>
-                    <p>Welcome to your Kubernetes playground! This instance is setting up a Kubernetes cluster for you.</p>
-                    <div class="warning-text">
-                        <strong>⚠️ Please wait approximately 30 seconds</strong><br>
-                        The Kubernetes cluster is initializing and will be ready shortly. You can start using kubectl commands once the initialization is complete.
-                    </div>
-                    <p>You'll see the terminal prompt once everything is ready to use.</p>
-                    <div class="k8s-disclaimer-buttons">
-                        <button ng-click="closeK8sDisclaimer()">Got It</button>
-                    </div>
                 </div>
             </section>
 
@@ -1007,49 +894,7 @@
                 $rootScope.sessionDuration = 900000;
                 
                 // Initialize variables
-                $rootScope.showK8sDisclaimer = false;
                 $rootScope.isCreatingInitialInstance = false;
-                
-                // Function to check if K8s cluster is ready
-                $rootScope.checkK8sClusterReady = function(instance) {
-                    if (!instance || !instance.terminal) return;
-                    
-                    // Send a kubectl command to check cluster status
-                    var checkCommand = 'kubectl cluster-info --request-timeout=5s';
-                    instance.terminal.write(checkCommand + '\r');
-                    
-                    // Monitor for successful response
-                    // This is a simplified check - in practice you'd need to parse terminal output
-                    return true; // Placeholder
-                };
-
-                // Modified disclaimer with cluster status check
-                $rootScope.showK8sDisclaimerWithCheck = function(instance) {
-                    $rootScope.showK8sDisclaimer = true;
-                    $rootScope.currentInstance = instance;
-                    
-                    // Start checking cluster readiness
-                    var checkInterval = setInterval(function() {
-                        if ($rootScope.checkK8sClusterReady(instance)) {
-                            clearInterval(checkInterval);
-                            // Cluster is ready - could update modal content
-                        }
-                    }, 5000); // Check every 5 seconds
-                };
-
-                // Show disclaimer when first instance is shown
-                var originalShowInstance = $rootScope.showInstance;
-                $rootScope.showInstance = function(instance) {
-                    if (originalShowInstance) {
-                        originalShowInstance.call(this, instance);
-                    }
-                    
-                    // Show disclaimer for any instance
-                    if (instance && !$rootScope.hasShownDisclaimer) {
-                        $rootScope.showK8sDisclaimerWithCheck(instance);
-                        $rootScope.hasShownDisclaimer = true;
-                    }
-                };
                 
                 // Function to create initial instance
                 $rootScope.createInitialInstance = function() {
@@ -1062,11 +907,6 @@
                             $rootScope.newInstance();
                         }
                         $rootScope.isCreatingInitialInstance = false;
-                        
-                        // Show the K8s disclaimer when the first instance is created
-                        $timeout(function() {
-                            $rootScope.showK8sDisclaimer = true;
-                        }, 1000);
                     }, 2000); // Wait 2 seconds to simulate creation
                 };
                 
@@ -1139,12 +979,8 @@
                 $timeout(function() {
                     // Wait longer to check if PWD has any existing instances
                     if ($rootScope.isAlive && (!$rootScope.instances || $rootScope.instances.length === 0)) {
-                        // Show disclaimer immediately, then create instance
-                        $rootScope.showK8sDisclaimer = true;
+                        // Create instance
                         $rootScope.createInitialInstance();
-                    } else if ($rootScope.instances && $rootScope.instances.length > 0) {
-                        // If instances already exist, just show the disclaimer
-                        $rootScope.showK8sDisclaimer = true;
                     }
                 }, 3000); // Increased delay to let PWD initialize
                 
